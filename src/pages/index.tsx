@@ -10,19 +10,22 @@ import {
   Button,
   FileInput,
   Badge,
+  Progress,
 } from "flowbite-react";
 import { IoIosAdd } from "react-icons/io";
 import { useBotFileContext } from "../context/BotFileContext";
 import { supabase } from "../utils/supabaseClient";
 import { useAlertContext } from "../context/AlertContext";
+import { useBotModelContext } from "../context/BotModelContext";
 
 const DashboardPage: React.FC = () => {
   const { bots, selectedBot, setSelectedBot, createBot, updateBot } =
     useBotContext();
   const { botFiles, createBotFile } = useBotFileContext();
-  const [createBotBool, setCreateBotBool] = React.useState(true);
+  const [createBotBool, setCreateBotBool] = React.useState(false);
   const [files, setFiles] = React.useState<FileList | null>(null);
   const { showAlert } = useAlertContext();
+  const { botModels } = useBotModelContext();
   const [botData, setBotData] = React.useState({
     name: "",
     description: "",
@@ -63,13 +66,20 @@ const DashboardPage: React.FC = () => {
     // Handle files
     if (files) {
       for (let i = 0; i < files.length; i++) {
+        const extension = files[i].name.split(".").pop();
+        const randomId =
+          Math.random().toString(36).substring(7) + "." + extension;
+
         // Upload into supabase first
-        const { error } = await supabase.storage
-          .from("bots_files")
-          .upload(files[i].name, files[i]);
+        const { data, error } = await supabase.storage
+          .from("bot_files")
+          .upload(randomId, files[i]);
 
         if (error) {
+          console.error("Error uploading file:", error);
+          console.error("Data:", data);
           showAlert("Error uploading file", "error");
+          return;
         }
 
         // Create bot file
@@ -77,10 +87,33 @@ const DashboardPage: React.FC = () => {
           bot_id: selectedBot ? selectedBot.id : newBotId,
           file_name: files[i].name,
           file_url:
-            "https://ldemovdvrlzrneitmwez.supabase.co/storage/v1/object/sign/bot_files/" +
-            files[i].name,
+            "https://ldemovdvrlzrneitmwez.supabase.co/storage/v1/object/public/bot_files/" +
+            randomId,
         });
       }
+    }
+  };
+
+  const startTrainingBot = async () => {
+    try {
+      // Call API to server to start training the bot with the id
+      const response = await fetch(`http://localhost:8000/train-bot`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Set the correct header for JSON data
+        },
+        body: JSON.stringify({ modelId: selectedBot?.id }), // Convert the body to a JSON string
+      });
+
+      // Check if the response is successful
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const data = await response.json(); // Assuming the response is in JSON format
+      console.log(data);
+    } catch (error) {
+      console.error("Error starting bot training:", error);
     }
   };
 
@@ -124,13 +157,37 @@ const DashboardPage: React.FC = () => {
             <Card className="cursor-pointer mb-4 h-[calc(100vh-8rem)] w-full overflow-y-auto hide-scrollbar">
               <div className="flex p-4 gap-4 flex-col">
                 <div className="flex items-center justify-between">
-                  <h2 className="intro-y text-lg font-medium">
-                    Bot Information
-                  </h2>
-                  <Badge color="primary" className="ml-2">
+                  <div className="flex items-center gap-2">
+                    <h2 className="intro-y text-lg font-medium">
+                      Bot Information
+                    </h2>
+                    <Badge
+                      color={
+                        selectedBot?.status === "TRAINING" ? "yellow" : "gray"
+                      }
+                      className="ml-2">
+                      {selectedBot?.status}
+                    </Badge>
+
+                    {/* Show progress bar if bot is training */}
+                    {selectedBot?.status === "TRAINING" && (
+                      <div className="w-full ml-4">
+                        <Progress
+                          color="blue"
+                          labelProgress
+                          progress={selectedBot?.progress || 0} // Ensure the progress is between 0 and 100
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <Badge
+                    color={selectedBot?.active_version ? "green" : "red"}
+                    className="ml-2">
                     {selectedBot?.active_version
-                      ? selectedBot?.active_version
-                      : "v1"}
+                      ? botModels.find(
+                          (model) => model.id === selectedBot?.active_version
+                        )?.version
+                      : "No Active Version"}
                   </Badge>
                 </div>
 
@@ -266,9 +323,7 @@ const DashboardPage: React.FC = () => {
                       <div
                         key={file.id}
                         className="flex items-center p-4 bg-gray-100 dark:bg-gray-600 rounded-md">
-                        <div
-                          className="font-medium text-ellipsis text-sm
-                          ">
+                        <div className="font-medium text-sm truncate w-full overflow-hidden whitespace-nowrap">
                           {file.file_name}
                         </div>
                       </div>
@@ -280,16 +335,32 @@ const DashboardPage: React.FC = () => {
                   <Button size="sm" color="primary" onClick={handleSaveBot}>
                     Save Bot
                   </Button>
+
+                  {/* Start Training */}
+                  <Button
+                    size="sm"
+                    color="purple"
+                    className="ml-2"
+                    onClick={startTrainingBot}
+                    disabled={selectedBot?.status === "TRAINING"}
+                    >
+                    Start Training
+                  </Button>
                 </div>
               </div>
             </Card>
           </div>
         )}
         {/* Preview */}
-        {(selectedBot || createBotBool) && (
-          <div
-            className="col-span-12 lg:col-span-4 h-[calc(100vh-8rem)] w-full flex items-center justify-center">
-            <h2 className="intro-y text-lg font-medium">Preview</h2>
+        {(selectedBot || createBotBool) && selectedBot?.active_version && (
+          <div className="col-span-12 lg:col-span-4 h-[calc(100vh-8rem)] w-full flex flex-col justify-center items-center p-4">
+            <iframe
+              src={`http://localhost:3000/chat-widget/${selectedBot.id}`}
+              width="100%"
+              style={{ height: `calc(100vh - 8rem)`, border: "none" }}
+              title="Chat"
+              frameBorder="0"
+            />
           </div>
         )}
       </div>

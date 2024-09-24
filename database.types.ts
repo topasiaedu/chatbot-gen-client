@@ -67,33 +67,47 @@ export type Database = {
       }
       bots: {
         Row: {
-          active_version: number | null
+          active_version: string | null
           created_at: string
           description: string | null
           id: string
           name: string
+          progress: number | null
+          status: string | null
           training_breadth: number | null
           training_depth: number | null
         }
         Insert: {
-          active_version?: number | null
+          active_version?: string | null
           created_at?: string
           description?: string | null
           id?: string
           name: string
+          progress?: number | null
+          status?: string | null
           training_breadth?: number | null
           training_depth?: number | null
         }
         Update: {
-          active_version?: number | null
+          active_version?: string | null
           created_at?: string
           description?: string | null
           id?: string
           name?: string
+          progress?: number | null
+          status?: string | null
           training_breadth?: number | null
           training_depth?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "bots_active_version_fkey"
+            columns: ["active_version"]
+            isOneToOne: false
+            referencedRelation: "bot_models"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

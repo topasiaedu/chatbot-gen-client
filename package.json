@@ -12,7 +12,7 @@
     "@types/react": "^18.2.70",
     "@types/react-dom": "^18.2.22",
     "autoprefixer": "^10.4.2",
-    "axios": "^1.6.8",
+    "axios": "^1.7.7",
     "fabricjs-react": "^2.0.0",
     "flowbite-react": "latest",
     "lodash.debounce": "^4.0.8",

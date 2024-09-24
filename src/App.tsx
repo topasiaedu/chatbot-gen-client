@@ -26,6 +26,7 @@ import React from "react";
 import { BotProvider } from "./context/BotContext";
 import { BotFileProvider } from "./context/BotFileContext";
 import { BotModelProvider } from "./context/BotModelContext";
+import ChatWidget from "./pages/dashboard/chat-widget";
 
 const App: React.FC = () => (
   <AlertProvider>
@@ -53,6 +54,8 @@ const App: React.FC = () => (
                       element={<UserSettingsPage />}
                     />
                   </Route>
+
+                  <Route path="/chat-widget/:bot_model_id" element={<ChatWidget />} />
 
                   {/* Public Routes */}
                   <Route path="/pages/pricing" element={<PricingPage />} />
