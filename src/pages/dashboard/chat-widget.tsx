@@ -32,7 +32,7 @@ const ChatWidget: React.FC = () => {
     const userMessage = { text: input, sender: "user" };
     setMessages([...messages, userMessage]);
 
-    const response = await fetch(`http://localhost:8000/chat-with-bot`, {
+    const response = await fetch(`https://cbg.whatsgenie.com/chat-with-bot`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

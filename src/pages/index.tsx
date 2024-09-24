@@ -355,7 +355,7 @@ const DashboardPage: React.FC = () => {
         {(selectedBot || createBotBool) && selectedBot?.active_version && (
           <div className="col-span-12 lg:col-span-4 h-[calc(100vh-8rem)] w-full flex flex-col justify-center items-center p-4">
             <iframe
-              src={`http://localhost:3000/chat-widget/${selectedBot.id}`}
+              src={`https://chatbot-gen-client.vercel.app/chat-widget/${selectedBot.id}`}
               width="100%"
               style={{ height: `calc(100vh - 8rem)`, border: "none" }}
               title="Chat"
