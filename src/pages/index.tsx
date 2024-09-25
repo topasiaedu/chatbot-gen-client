@@ -97,7 +97,7 @@ const DashboardPage: React.FC = () => {
   const startTrainingBot = async () => {
     try {
       // Call API to server to start training the bot with the id
-      const response = await fetch(`http://localhost:8000/train-bot`, {
+      const response = await fetch(`https://cbg.whatsgenie.com/train-bot`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // Set the correct header for JSON data
