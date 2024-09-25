@@ -346,6 +346,20 @@ const DashboardPage: React.FC = () => {
                     >
                     Start Training
                   </Button>
+                  {/* Copy Embed Code Button */}
+                  {/* Copy the html to clipboard */}
+                  <Button
+                    size="sm"
+                    color="secondary"
+                    className="ml-2"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        `<iframe src="https://chatbot-gen-client.vercel.app/chat-widget/${selectedBot?.id}" width="100%" style="height: 500px; border: none;" title="Chat" frameBorder="0"></iframe>`
+                      );
+                      showAlert("Embed code copied to clipboard", "success");
+                    }}>
+                    Copy Embed Code
+                  </Button>
                 </div>
               </div>
             </Card>
