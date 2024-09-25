@@ -56,7 +56,7 @@ export const BotProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
 
     const handleChanges = (payload: any) => {
       if (payload.eventType === "INSERT") {
-        setBots((prev) => [...prev, payload.new]);
+        setBots((prev) => [...prev, payload.new]);  
       } else if (payload.eventType === "UPDATE") {
         setBots((prev) =>
           prev.map((bot) => (bot.id === payload.new.id ? payload.new : bot))

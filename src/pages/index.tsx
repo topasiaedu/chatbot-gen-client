@@ -31,6 +31,8 @@ const DashboardPage: React.FC = () => {
     description: "",
     training_depth: 1,
     training_breadth: 1000,
+    status: "DRAFT",
+    progress: 0,
   });
 
   useEffect(() => {
@@ -40,6 +42,8 @@ const DashboardPage: React.FC = () => {
         description: selectedBot.description || "",
         training_depth: selectedBot.training_depth || 1,
         training_breadth: selectedBot.training_breadth || 1000,
+        status: selectedBot.status || "DRAFT",
+        progress: selectedBot.progress || 0,
       });
     } else {
       setBotData({
@@ -47,6 +51,8 @@ const DashboardPage: React.FC = () => {
         description: "",
         training_depth: 1,
         training_breadth: 1000,
+        status: "DRAFT",
+        progress: 0,
       });
     }
   }, [selectedBot]);
@@ -96,6 +102,10 @@ const DashboardPage: React.FC = () => {
 
   const startTrainingBot = async () => {
     try {
+
+      // Change the status to TRAINING
+      setBotData({ ...botData, status: "TRAINING", progress: 0 });
+
       // Call API to server to start training the bot with the id
       const response = await fetch(`https://cbg.whatsgenie.com/train-bot`, {
         method: "POST",
@@ -163,19 +173,19 @@ const DashboardPage: React.FC = () => {
                     </h2>
                     <Badge
                       color={
-                        selectedBot?.status === "TRAINING" ? "yellow" : "gray"
+                        botData?.status === "TRAINING" ? "yellow" : "gray"
                       }
                       className="ml-2">
-                      {selectedBot?.status}
+                      {botData?.status}
                     </Badge>
 
                     {/* Show progress bar if bot is training */}
-                    {selectedBot?.status === "TRAINING" && (
+                    {botData?.status === "TRAINING" && (
                       <div className="w-full ml-4">
                         <Progress
                           color="blue"
                           labelProgress
-                          progress={selectedBot?.progress || 0} // Ensure the progress is between 0 and 100
+                          progress={botData?.progress || 0} // Ensure the progress is between 0 and 100
                         />
                       </div>
                     )}
@@ -342,7 +352,7 @@ const DashboardPage: React.FC = () => {
                     color="purple"
                     className="ml-2"
                     onClick={startTrainingBot}
-                    disabled={selectedBot?.status === "TRAINING"}
+                    disabled={botData?.status === "TRAINING"}
                     >
                     Start Training
                   </Button>
