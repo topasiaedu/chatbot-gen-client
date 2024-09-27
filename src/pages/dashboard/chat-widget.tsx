@@ -91,10 +91,10 @@ const ChatWidget: React.FC = () => {
   return (
     <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4 dark:bg-gray-900">
       {/* Chat area container that takes up full available height */}
-      <div className="flex flex-col h-full w-full max-w-md mx-auto">
+      <div className="flex flex-col h-full w-full mx-auto">
         {/* Header for the name */}
         <div className="flex items-center justify-between p-4 bg-white shadow-sm dark:bg-gray-800">
-          <div className="text-xl font-semibold text-gray-900">
+          <div className="text-xl font-semibold text-gray-900 dark:text-white">
             {bots.find((bot) => bot.id === bot_model_id)?.name || "Bot"}
           </div>
           <DarkThemeToggle />
