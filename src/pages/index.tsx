@@ -153,7 +153,7 @@ const DashboardPage: React.FC = () => {
               onClick={() => setSelectedBot(bot)}>
               <div className="flex p-4 flex-col">
                 <div className="font-medium">{bot.name}</div>
-                <div className="text-gray-600 text-xs">{bot.description}</div>
+                {/* <div className="text-gray-600 text-xs">{bot.description}</div> */}
               </div>
             </Card>
           ))}
