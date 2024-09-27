@@ -89,11 +89,11 @@ const ChatWidget: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4">
+    <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4 dark:bg-gray-900">
       {/* Chat area container that takes up full available height */}
       <div className="flex flex-col h-full w-full max-w-md mx-auto">
         {/* Header for the name */}
-        <div className="flex items-center justify-between p-4 bg-white shadow-sm">
+        <div className="flex items-center justify-between p-4 bg-white shadow-sm dark:bg-gray-800">
           <div className="text-xl font-semibold text-gray-900">
             {bots.find((bot) => bot.id === bot_model_id)?.name || "Bot"}
           </div>
@@ -110,8 +110,8 @@ const ChatWidget: React.FC = () => {
               <div
                 className={`rounded-lg px-4 py-2 max-w-xs ${
                   msg.sender === "user"
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 text-gray-900"
+                    ? "bg-blue-500 text-white dark:bg-blue-600"
+                    : "bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white"
                 }`}>
                 {msg.text}
               </div>
