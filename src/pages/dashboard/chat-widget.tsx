@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
+import { useBotContext } from "../../context/BotContext";
+import { Button, TextInput } from "flowbite-react";
 
 const ChatWidget: React.FC = () => {
   const { bot_model_id } = useParams<{ bot_model_id: string }>();
@@ -8,6 +10,7 @@ const ChatWidget: React.FC = () => {
   );
   const [input, setInput] = useState("");
   const messageEndRef = useRef<HTMLDivElement | null>(null); // Ref for the message container
+  const { bots } = useBotContext();
 
   useEffect(() => {
     if (bot_model_id) {
@@ -38,6 +41,7 @@ const ChatWidget: React.FC = () => {
       body: JSON.stringify({
         botId: bot_model_id,
         prompt: input,
+        messages: messages,
       }),
     });
 
@@ -49,6 +53,37 @@ const ChatWidget: React.FC = () => {
       { text: botResponse.completion, sender: "bot" },
     ]);
   };
+
+  if (messages.length === 0) {
+    return (
+      <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4">
+        <div className="text-2xl font-semibold text-gray-900 mb-6">
+          Start chatting with{" "}
+          {bots.find((bot) => bot.id === bot_model_id)?.name || "the bot"}!
+        </div>
+
+        {/* Input with Flowbite TextInput and a clean button */}
+        <div className="flex items-center space-x-3 w-full max-w-md">
+          <TextInput
+            type="text"
+            placeholder="Type a message..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className="flex-1"
+            onKeyPress={(e) => e.key === "Enter" && handleSend}
+          />
+
+          <Button
+            color="blue"
+            outline={true}
+            onClick={handleSend}
+            className="font-medium">
+            Send
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4">

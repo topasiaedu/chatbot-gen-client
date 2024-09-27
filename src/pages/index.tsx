@@ -13,15 +13,16 @@ import {
   Progress,
 } from "flowbite-react";
 import { IoIosAdd } from "react-icons/io";
-import { useBotFileContext } from "../context/BotFileContext";
+import { BotFile, useBotFileContext } from "../context/BotFileContext";
 import { supabase } from "../utils/supabaseClient";
 import { useAlertContext } from "../context/AlertContext";
 import { useBotModelContext } from "../context/BotModelContext";
+import { IoMdClose } from "react-icons/io";
 
 const DashboardPage: React.FC = () => {
   const { bots, selectedBot, setSelectedBot, createBot, updateBot } =
     useBotContext();
-  const { botFiles, createBotFile } = useBotFileContext();
+  const { botFiles, createBotFile, deleteBotFile } = useBotFileContext();
   const [createBotBool, setCreateBotBool] = React.useState(false);
   const [files, setFiles] = React.useState<FileList | null>(null);
   const { showAlert } = useAlertContext();
@@ -56,6 +57,10 @@ const DashboardPage: React.FC = () => {
       });
     }
   }, [selectedBot]);
+
+  useEffect(() => {
+
+  }, [files]);
 
   const handleSaveBot = async () => {
     let newBotId = "";
@@ -126,6 +131,11 @@ const DashboardPage: React.FC = () => {
       console.error("Error starting bot training:", error);
     }
   };
+
+  const handleDeleteBotFile = async (botFile:BotFile) => {
+    await deleteBotFile(botFile);
+  }
+    
 
   return (
     <NavbarSidebarLayout>
@@ -336,6 +346,10 @@ const DashboardPage: React.FC = () => {
                         <div className="font-medium text-sm truncate w-full overflow-hidden whitespace-nowrap">
                           {file.file_name}
                         </div>
+                        <IoMdClose
+                          className="cursor-pointer text-red-500"
+                          onClick={() => handleDeleteBotFile(file)}
+                        />
                       </div>
                     ))}
                 </div>
@@ -380,6 +394,7 @@ const DashboardPage: React.FC = () => {
           <div className="col-span-12 lg:col-span-4 h-[calc(100vh-8rem)] w-full flex flex-col justify-center items-center p-4">
             <iframe
               src={`https://chatbot-gen-client.vercel.app/chat-widget/${selectedBot.id}`}
+              // src={`http://localhost:3000/chat-widget/${selectedBot.id}`}
               width="100%"
               style={{ height: `calc(100vh - 8rem)`, border: "none" }}
               title="Chat"
