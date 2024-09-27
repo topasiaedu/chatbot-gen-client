@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useBotContext } from "../../context/BotContext";
-import { Button, TextInput } from "flowbite-react";
+import { Button, TextInput, DarkThemeToggle } from "flowbite-react";
 
 const ChatWidget: React.FC = () => {
   const { bot_model_id } = useParams<{ bot_model_id: string }>();
@@ -56,12 +56,15 @@ const ChatWidget: React.FC = () => {
 
   if (messages.length === 0) {
     return (
-      <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4">
-        <div className="text-2xl font-semibold text-gray-900 mb-6">
-          Start chatting with{" "}
-          {bots.find((bot) => bot.id === bot_model_id)?.name || "the bot"}!
+      <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4 dark:bg-gray-900">
+        {/* Make the toggle in the same line as the title horizontally */}
+        <div className="flex items-center w-full max-w-md mb-6 justify-center space-x-3">
+          <div className="text-2xl font-semibold text-gray-900 dark:text-white">
+            Start chatting with{" "}
+            {bots.find((bot) => bot.id === bot_model_id)?.name || "the bot"}!
+          </div>
+          <DarkThemeToggle />
         </div>
-
         {/* Input with Flowbite TextInput and a clean button */}
         <div className="flex items-center space-x-3 w-full max-w-md">
           <TextInput
@@ -74,7 +77,7 @@ const ChatWidget: React.FC = () => {
           />
 
           <Button
-            color="blue"
+            color="primary"
             outline={true}
             onClick={handleSend}
             className="font-medium">
@@ -89,6 +92,13 @@ const ChatWidget: React.FC = () => {
     <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4">
       {/* Chat area container that takes up full available height */}
       <div className="flex flex-col h-full w-full max-w-md mx-auto">
+        {/* Header for the name */}
+        <div className="flex items-center justify-between p-4 bg-white shadow-sm">
+          <div className="text-xl font-semibold text-gray-900">
+            {bots.find((bot) => bot.id === bot_model_id)?.name || "Bot"}
+          </div>
+          <DarkThemeToggle />
+        </div>
         {/* Message area */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((msg, index) => (
@@ -114,19 +124,22 @@ const ChatWidget: React.FC = () => {
 
         {/* Input area */}
         <div className="flex items-center space-x-3 p-4">
-          <input
+          <TextInput
             type="text"
-            className="flex-1 bg-white border-0 focus:outline-none rounded-full py-2 px-4 shadow-sm"
             placeholder="Type a message..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSend()}
+            className="flex-1"
+            onKeyPress={(e) => e.key === "Enter" && handleSend}
           />
-          <button
-            className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onClick={handleSend}>
+
+          <Button
+            color="primary"
+            outline={true}
+            onClick={handleSend}
+            className="font-medium">
             Send
-          </button>
+          </Button>
         </div>
       </div>
     </div>
