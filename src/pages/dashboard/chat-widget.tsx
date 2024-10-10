@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useBotContext } from "../../context/BotContext";
 import { Button, TextInput, DarkThemeToggle } from "flowbite-react";
+import Markdown from "markdown-to-jsx";
+import "./chat-widget.css";
 
 const ChatWidget: React.FC = () => {
   const { bot_model_id } = useParams<{ bot_model_id: string }>();
@@ -9,7 +11,8 @@ const ChatWidget: React.FC = () => {
     []
   );
   const [input, setInput] = useState("");
-  const messageEndRef = useRef<HTMLDivElement | null>(null); // Ref for the message container
+  const [botIsThinking, setBotIsThinking] = useState(false); 
+  const messageEndRef = useRef<HTMLDivElement | null>(null); 
   const { bots } = useBotContext();
 
   useEffect(() => {
@@ -26,14 +29,48 @@ const ChatWidget: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]); // Trigger scrolling when the messages array changes
+  }, [messages]);
+
+  const streamResponse = (botMessage: string) => {
+    return new Promise<void>((resolve) => {
+      let currentMessage = "";
+      const typingInterval = 10; // Speed of typing effect (ms per character)
+      let index = 0;
+
+      // Fix for numbered list missing by ensuring an empty line before the list
+      const fixedMessage = botMessage.replace(/(\d+\.)/g, "\n$1"); // Add a newline before numbered items
+
+      setMessages((prev) => [
+        ...prev,
+        { text: "", sender: "bot" }, // Add the bot message placeholder right when typing starts
+      ]);
+
+      const typingEffect = setInterval(() => {
+        if (index < fixedMessage.length) {
+          currentMessage += fixedMessage[index];
+          setMessages((prev) => {
+            const updatedMessages = [...prev];
+            updatedMessages[updatedMessages.length - 1].text = currentMessage;
+            return updatedMessages;
+          });
+          index++;
+        } else {
+          clearInterval(typingEffect);
+          console.log("Messages:", messages);
+          resolve();
+        }
+      }, typingInterval);
+    });
+  };
 
   const handleSend = async () => {
     if (!input.trim()) return;
-    setInput("");
-
     const userMessage = { text: input, sender: "user" };
     setMessages([...messages, userMessage]);
+    setInput("");
+
+    // Set "bot is thinking" state
+    setBotIsThinking(true);
 
     const response = await fetch(`https://cbg.whatsgenie.com/chat-with-bot`, {
       method: "POST",
@@ -46,12 +83,12 @@ const ChatWidget: React.FC = () => {
     });
 
     const botResponse = await response.json();
-    console.log("Bot response:", botResponse);
-    setMessages([
-      ...messages,
-      userMessage,
-      { text: botResponse.completion, sender: "bot" },
-    ]);
+
+    // Turn off "bot is thinking" state
+    setBotIsThinking(false);
+
+    // Start streaming the bot's response text
+    await streamResponse(botResponse.completion);
   };
 
   if (messages.length === 0) {
@@ -73,7 +110,7 @@ const ChatWidget: React.FC = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="flex-1"
-            onKeyPress={(e) => e.key === "Enter" && handleSend}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
           />
 
           <Button
@@ -108,16 +145,33 @@ const ChatWidget: React.FC = () => {
                 msg.sender === "user" ? "justify-end" : "justify-start"
               }`}>
               <div
-                className={`rounded-lg px-4 py-2 max-w-xs ${
+                className={`rounded-lg px-4 py-2 max-w-7xl ${
                   msg.sender === "user"
                     ? "bg-blue-500 text-white dark:bg-blue-600"
                     : "bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white"
                 }`}>
-                {msg.text}
+                {/* Render message with markdown formatting */}
+                <div
+                  className="markdown-content"
+                  style={{
+                    whiteSpace: "pre-wrap", // Ensure line breaks are respected
+                    lineHeight: "1.5rem", // Improve readability
+                  }}>
+                  <Markdown>{msg.text}</Markdown>
+                  {/* Directly render markdown as JSX */}
+                </div>
               </div>
             </div>
           ))}
+          {botIsThinking && (
+            <div className="flex justify-start">
+              <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse"></div>
 
+              <div className="rounded-lg px-4 py-2 max-w-xs text-gray-900 dark:text-white">
+                <em>Bot is thinking...</em>
+              </div>
+            </div>
+          )}
           {/* Dummy div to capture the scroll position */}
           <div ref={messageEndRef} />
         </div>
@@ -130,7 +184,7 @@ const ChatWidget: React.FC = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="flex-1"
-            onKeyPress={(e) => e.key === "Enter" && handleSend}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
           />
 
           <Button
@@ -146,4 +200,7 @@ const ChatWidget: React.FC = () => {
   );
 };
 
+
 export default ChatWidget;
+
+export {};

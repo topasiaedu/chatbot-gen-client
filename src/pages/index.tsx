@@ -26,6 +26,7 @@ const DashboardPage: React.FC = () => {
   const [createBotBool, setCreateBotBool] = React.useState(false);
   const [files, setFiles] = React.useState<FileList | null>(null);
   const { showAlert } = useAlertContext();
+  const [fullScreenPreview, setFullScreenPreview] = React.useState(false);
   const { botModels } = useBotModelContext();
   const [botData, setBotData] = React.useState({
     name: "",
@@ -58,9 +59,7 @@ const DashboardPage: React.FC = () => {
     }
   }, [selectedBot]);
 
-  useEffect(() => {
-
-  }, [files]);
+  useEffect(() => {}, [files]);
 
   const handleSaveBot = async () => {
     let newBotId = "";
@@ -107,7 +106,6 @@ const DashboardPage: React.FC = () => {
 
   const startTrainingBot = async () => {
     try {
-
       // Change the status to TRAINING
       setBotData({ ...botData, status: "TRAINING", progress: 0 });
 
@@ -132,48 +130,48 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  const handleDeleteBotFile = async (botFile:BotFile) => {
+  const handleDeleteBotFile = async (botFile: BotFile) => {
     await deleteBotFile(botFile);
-  }
-    
+  };
 
   return (
     <NavbarSidebarLayout>
       {/* 3 Column - Bot Sidebar - Bot Info - Preview */}
       {/* Bot Info and preview will only come out when there is a bot selected */}
       <div className="grid grid-cols-12 gap-6">
-        {/* Bot Sidebar */}
-        <div className="col-span-12 lg:col-span-2 p-4">
-          {bots.map((bot) => (
+        {!fullScreenPreview && (
+          <div className="col-span-12 lg:col-span-2 p-4 ">
+            {bots.map((bot) => (
+              <Card
+                key={bot.id}
+                className={`cursor-pointer mb-4 ${
+                  selectedBot?.id === bot.id ? "bg-theme-1" : ""
+                }`}
+                onClick={() => setSelectedBot(bot)}>
+                <div className="flex p-4 flex-col">
+                  <div className="font-medium">{bot.name}</div>
+                  {/* <div className="text-gray-600 text-xs">{bot.description}</div> */}
+                </div>
+              </Card>
+            ))}
+
+            {/* Create a new bot Card */}
             <Card
-              key={bot.id}
-              className={`cursor-pointer mb-4 ${
-                selectedBot?.id === bot.id ? "bg-theme-1" : ""
-              }`}
-              onClick={() => setSelectedBot(bot)}>
-              <div className="flex p-4 flex-col">
-                <div className="font-medium">{bot.name}</div>
-                {/* <div className="text-gray-600 text-xs">{bot.description}</div> */}
+              className="cursor-pointer mb-4 hover:bg-theme-1 transition duration-200"
+              onClick={() => {
+                setSelectedBot(null);
+                setCreateBotBool(true);
+              }}>
+              <div className="flex items-center p-4">
+                <IoIosAdd className="w-6 h-6 mr-2" />
+                <div>Create a new bot</div>
               </div>
             </Card>
-          ))}
-
-          {/* Create a new bot Card */}
-          <Card
-            className="cursor-pointer mb-4 hover:bg-theme-1 transition duration-200"
-            onClick={() => {
-              setSelectedBot(null);
-              setCreateBotBool(true);
-            }}>
-            <div className="flex items-center p-4">
-              <IoIosAdd className="w-6 h-6 mr-2" />
-              <div>Create a new bot</div>
-            </div>
-          </Card>
-        </div>
+          </div>
+        )}
         {/* Bot Info */}
-        {(selectedBot || createBotBool) && (
-          <div className="col-span-12 lg:col-span-6 p-4">
+        {(selectedBot || createBotBool) && !fullScreenPreview && (
+          <div className="col-span-12 lg:col-span-6 p-4 ">
             <Card className="cursor-pointer mb-4 h-[calc(100vh-8rem)] w-full overflow-y-auto hide-scrollbar">
               <div className="flex p-4 gap-4 flex-col">
                 <div className="flex items-center justify-between">
@@ -182,9 +180,7 @@ const DashboardPage: React.FC = () => {
                       Bot Information
                     </h2>
                     <Badge
-                      color={
-                        botData?.status === "TRAINING" ? "yellow" : "gray"
-                      }
+                      color={botData?.status === "TRAINING" ? "yellow" : "gray"}
                       className="ml-2">
                       {botData?.status}
                     </Badge>
@@ -366,8 +362,7 @@ const DashboardPage: React.FC = () => {
                     color="purple"
                     className="ml-2"
                     onClick={startTrainingBot}
-                    disabled={botData?.status === "TRAINING"}
-                    >
+                    disabled={botData?.status === "TRAINING"}>
                     Start Training
                   </Button>
                   {/* Copy Embed Code Button */}
@@ -391,7 +386,22 @@ const DashboardPage: React.FC = () => {
         )}
         {/* Preview */}
         {(selectedBot || createBotBool) && selectedBot?.active_version && (
-          <div className="col-span-12 lg:col-span-4 h-[calc(100vh-8rem)] w-full flex flex-col justify-center items-center p-4">
+          <div
+            className={`h-[calc(100vh-8rem)] w-full flex flex-col justify-center items-center p-4 ${
+              !fullScreenPreview ? "col-span-12 lg:col-span-4" : "col-span-12"
+            }`}>
+            <div className="flex items-center justify-between w-full">
+              <h2 className="intro-y text-lg font-medium">
+                Chat Widget Preview
+              </h2>
+              <Button
+                size="sm"
+                color="primary"
+                className="ml-2"
+                onClick={() => setFullScreenPreview(!fullScreenPreview)}>
+                {fullScreenPreview ? "Exit Full Screen" : "Full Screen Preview"}
+              </Button>
+            </div>
             <iframe
               src={`https://chatbot-gen-client.vercel.app/chat-widget/${selectedBot.id}`}
               // src={`http://localhost:3000/chat-widget/${selectedBot.id}`}

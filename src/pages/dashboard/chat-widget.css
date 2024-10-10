@@ -1,0 +1,50 @@
+/* Style for ordered and unordered lists */
+.markdown-content ol,.markdown-content ul {
+  list-style: auto;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.75; /* Similar to ChatGPT style for readability */
+}
+
+.markdown-content li {
+  margin-bottom: 0.5rem; /* Slight spacing between list items */
+}
+
+
+/* Styling for tables (similar to how ChatGPT formats structured content) */
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.markdown-content th,.markdown-content td {
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.markdown-content th {
+  font-weight: bold;
+}
+
+/* Style for blockquotes, often used for quoted content */
+.markdown-content blockquote {
+  border-left: 4px solid #ccc;
+  padding-left: 1rem;
+  margin-left: 0;
+  font-style: italic;
+}
+
+/* Inline code and code blocks */
+.markdown-content code {
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.markdown-content pre {
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+}
