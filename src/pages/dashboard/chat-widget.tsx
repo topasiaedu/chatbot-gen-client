@@ -3,7 +3,9 @@ import { useParams } from "react-router-dom";
 import { useBotContext } from "../../context/BotContext";
 import { Button, TextInput, DarkThemeToggle } from "flowbite-react";
 import Markdown from "markdown-to-jsx";
+import animationData from "./loading.json"; // Import your Lottie JSON file
 import "./chat-widget.css";
+import Lottie from "lottie-react";
 
 const ChatWidget: React.FC = () => {
   const { bot_model_id } = useParams<{ bot_model_id: string }>();
@@ -11,14 +13,21 @@ const ChatWidget: React.FC = () => {
     []
   );
   const [input, setInput] = useState("");
-  const [botIsThinking, setBotIsThinking] = useState(false); 
-  const messageEndRef = useRef<HTMLDivElement | null>(null); 
+  const [botIsThinking, setBotIsThinking] = useState(false);
+  const [loading, setLoading] = useState(true); // State to control loading screen
+  const messageEndRef = useRef<HTMLDivElement | null>(null);
   const { bots } = useBotContext();
 
   useEffect(() => {
     if (bot_model_id) {
       console.log("Bot model ID:", bot_model_id);
     }
+    // Simulate loading for 2 seconds
+    const loadingTimer = setTimeout(() => {
+      setLoading(false);
+    }, 2000); // Adjust this duration as needed
+
+    return () => clearTimeout(loadingTimer); // Cleanup timer on component unmount
   }, [bot_model_id]);
 
   const scrollToBottom = () => {
@@ -34,16 +43,12 @@ const ChatWidget: React.FC = () => {
   const streamResponse = (botMessage: string) => {
     return new Promise<void>((resolve) => {
       let currentMessage = "";
-      const typingInterval = 10; // Speed of typing effect (ms per character)
+      const typingInterval = 10;
       let index = 0;
 
-      // Fix for numbered list missing by ensuring an empty line before the list
-      const fixedMessage = botMessage.replace(/(\d+\.)/g, "\n$1"); // Add a newline before numbered items
+      const fixedMessage = botMessage.replace(/(\d+\.)/g, "\n$1");
 
-      setMessages((prev) => [
-        ...prev,
-        { text: "", sender: "bot" }, // Add the bot message placeholder right when typing starts
-      ]);
+      setMessages((prev) => [...prev, { text: "", sender: "bot" }]);
 
       const typingEffect = setInterval(() => {
         if (index < fixedMessage.length) {
@@ -69,7 +74,6 @@ const ChatWidget: React.FC = () => {
     setMessages([...messages, userMessage]);
     setInput("");
 
-    // Set "bot is thinking" state
     setBotIsThinking(true);
 
     const response = await fetch(`https://cbg.whatsgenie.com/chat-with-bot`, {
@@ -84,17 +88,23 @@ const ChatWidget: React.FC = () => {
 
     const botResponse = await response.json();
 
-    // Turn off "bot is thinking" state
     setBotIsThinking(false);
 
-    // Start streaming the bot's response text
     await streamResponse(botResponse.completion);
   };
+  
+  if (loading) {
+    return (
+      <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4 dark:bg-gray-900">
+        {/* Lottie Animation */}
+        <Lottie animationData={animationData} loop autoplay style={{ width: 200, height: 200 }} />
+      </div>
+    );
+  }
 
   if (messages.length === 0) {
     return (
       <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4 dark:bg-gray-900">
-        {/* Make the toggle in the same line as the title horizontally */}
         <div className="flex items-center w-full max-w-md mb-6 justify-center space-x-3">
           <div className="text-2xl font-semibold text-gray-900 dark:text-white">
             Start chatting with{" "}
@@ -102,7 +112,6 @@ const ChatWidget: React.FC = () => {
           </div>
           <DarkThemeToggle />
         </div>
-        {/* Input with Flowbite TextInput and a clean button */}
         <div className="flex items-center space-x-3 w-full max-w-md">
           <TextInput
             type="text"
@@ -112,7 +121,6 @@ const ChatWidget: React.FC = () => {
             className="flex-1"
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
           />
-
           <Button
             color="primary"
             outline={true}
@@ -127,16 +135,13 @@ const ChatWidget: React.FC = () => {
 
   return (
     <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4 dark:bg-gray-900">
-      {/* Chat area container that takes up full available height */}
       <div className="flex flex-col h-full w-full mx-auto">
-        {/* Header for the name */}
         <div className="flex items-center justify-between p-4 bg-white shadow-sm dark:bg-gray-800">
           <div className="text-xl font-semibold text-gray-900 dark:text-white">
             {bots.find((bot) => bot.id === bot_model_id)?.name || "Bot"}
           </div>
           <DarkThemeToggle />
         </div>
-        {/* Message area */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((msg, index) => (
             <div
@@ -150,15 +155,13 @@ const ChatWidget: React.FC = () => {
                     ? "bg-blue-500 text-white dark:bg-blue-600"
                     : "bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white"
                 }`}>
-                {/* Render message with markdown formatting */}
                 <div
                   className="markdown-content"
                   style={{
-                    whiteSpace: "pre-wrap", // Ensure line breaks are respected
-                    lineHeight: "1.5rem", // Improve readability
+                    whiteSpace: "pre-wrap",
+                    lineHeight: "1.5rem",
                   }}>
                   <Markdown>{msg.text}</Markdown>
-                  {/* Directly render markdown as JSX */}
                 </div>
               </div>
             </div>
@@ -166,17 +169,13 @@ const ChatWidget: React.FC = () => {
           {botIsThinking && (
             <div className="flex justify-start">
               <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse"></div>
-
               <div className="rounded-lg px-4 py-2 max-w-xs text-gray-900 dark:text-white">
                 <em>Bot is thinking...</em>
               </div>
             </div>
           )}
-          {/* Dummy div to capture the scroll position */}
           <div ref={messageEndRef} />
         </div>
-
-        {/* Input area */}
         <div className="flex items-center space-x-3 p-4">
           <TextInput
             type="text"
@@ -186,7 +185,6 @@ const ChatWidget: React.FC = () => {
             className="flex-1"
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
           />
-
           <Button
             color="primary"
             outline={true}
@@ -200,7 +198,4 @@ const ChatWidget: React.FC = () => {
   );
 };
 
-
 export default ChatWidget;
-
-export {};

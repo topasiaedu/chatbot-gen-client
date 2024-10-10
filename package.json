@@ -17,6 +17,7 @@
     "flowbite-react": "latest",
     "lodash.debounce": "^4.0.8",
     "lodash.isequal": "^4.5.0",
+    "lottie-react": "^2.4.0",
     "markdown-to-jsx": "^7.5.0",
     "my-app": "file:",
     "postcss": "^8.4.12",
