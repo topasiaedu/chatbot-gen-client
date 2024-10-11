@@ -403,8 +403,8 @@ const DashboardPage: React.FC = () => {
               </Button>
             </div>
             <iframe
-              // src={`https://chatbot-gen-client.vercel.app/chat-widget/${selectedBot.id}`}
-              src={`http://localhost:3000/chat-widget/${selectedBot.id}`}
+              src={`https://chatbot-gen-client.vercel.app/chat-widget/${selectedBot.id}`}
+              // src={`http://localhost:3000/chat-widget/${selectedBot.id}`}
               width="100%"
               style={{ height: `calc(100vh - 8rem)`, border: "none" }}
               title="Chat"
