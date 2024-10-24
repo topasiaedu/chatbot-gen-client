@@ -53,9 +53,12 @@ const App: React.FC = () => (
                       path="/users/settings"
                       element={<UserSettingsPage />}
                     />
+                    
+                    <Route
+                      path="/chat-widget/:bot_model_id"
+                      element={<ChatWidget />}
+                    />
                   </Route>
-
-                  <Route path="/chat-widget/:bot_model_id" element={<ChatWidget />} />
 
                   {/* Public Routes */}
                   <Route path="/pages/pricing" element={<PricingPage />} />

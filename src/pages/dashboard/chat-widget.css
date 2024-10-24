@@ -1,50 +1,148 @@
-/* Style for ordered and unordered lists */
-.markdown-content ol,.markdown-content ul {
-  list-style: auto;
-  padding-left: 1.5rem;
-  margin-bottom: 1rem;
-  line-height: 1.75; /* Similar to ChatGPT style for readability */
+/* General container styling */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  background-color: #f9f9f9;
+  padding: 16px; /* Add padding to overall chat container */
 }
 
-.markdown-content li {
-  margin-bottom: 0.5rem; /* Slight spacing between list items */
+/* Message container */
+.message-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background-color: var(--chat-bg, #ffffff);
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Consistent gap between messages */
 }
 
-
-/* Styling for tables (similar to how ChatGPT formats structured content) */
-.markdown-content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1rem 0;
+/* Message bubble styling */
+.message-bubble {
+  display: inline-block;
+  padding: 12px 18px; /* More padding for a cleaner look */
+  border-radius: 18px;
+  max-width: 80%; /* Ensure message bubbles don’t get too wide */
+  word-wrap: break-word;
+  margin-bottom: 10px;
+  font-size: 16px;
+  line-height: 1.6rem; /* Increased line height for better readability */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow to mimic ChatGPT */
 }
 
-.markdown-content th,.markdown-content td {
+/* User message bubble */
+.user-message {
+  align-self: flex-end;
+  background-color: #0084ff;
+  color: white;
+  margin-right: 10px;
+  border-bottom-right-radius: 0;
+  margin-left: 40px; /* Add some space between user and bot messages */
+}
+
+/* Bot message bubble */
+.bot-message {
+  align-self: flex-start;
+  background-color: #e5e5ea;
+  color: black;
+  margin-left: 10px;
+  border-bottom-left-radius: 0;
+  margin-right: 40px; /* Add space for bot messages from the right */
+}
+
+/* Markdown content styling */
+.markdown-content {
+  white-space: pre-wrap;
+  font-size: 16px;
+  line-height: 1.6rem;
+  margin: 0; /* Remove extra margins inside message content */
+}
+
+/* Bot is thinking animation */
+.bot-thinking {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px;
+  margin-left: 10px; /* Align with bot messages */
+}
+
+.bot-thinking .dot {
+  background-color: #e5e5ea;
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  margin-right: 5px;
+  animation: bounce 1s infinite;
+}
+
+/* Input and button container */
+.input-container {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: var(--input-bg, #f9f9f9);
+  border-top: 1px solid #ddd;
+  gap: 10px; /* Add spacing between input field and button */
+  padding: 16px 0; /* Add vertical padding to match message spacing */
+}
+
+/* Text input field */
+.input-field {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 18px;
   border: 1px solid #ddd;
-  padding: 0.75rem;
-  text-align: left;
+  background-color: white;
+  font-size: 16px;
+  line-height: 1.6rem;
 }
 
-.markdown-content th {
-  font-weight: bold;
+/* Send button */
+.send-button {
+  padding: 10px 18px;
+  border-radius: 18px;
+  background-color: #0084ff;
+  color: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
 }
 
-/* Style for blockquotes, often used for quoted content */
-.markdown-content blockquote {
-  border-left: 4px solid #ccc;
-  padding-left: 1rem;
-  margin-left: 0;
-  font-style: italic;
+.send-button:disabled {
+  background-color: #999;
+  cursor: not-allowed;
 }
 
-/* Inline code and code blocks */
-.markdown-content code {
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-  font-family: monospace;
+/* Dark mode support */
+:root {
+  --chat-bg: #f9f9f9;
+  --input-bg: #f9f9f9;
 }
 
-.markdown-content pre {
-  padding: 1rem;
-  border-radius: 8px;
-  overflow-x: auto;
+.dark-mode {
+  --chat-bg: #1f1f1f;
+  --input-bg: #2c2c2c;
+}
+
+.dark-mode .bot-message {
+  background-color: #444;
+  color: white;
+}
+
+.dark-mode .user-message {
+  background-color: #1a73e8;
+  color: white;
+}
+
+.dark-mode .input-field {
+  background-color: #333;
+  border-color: #555;
+  color: white;
+}
+
+.dark-mode .send-button {
+  background-color: #1a73e8;
 }

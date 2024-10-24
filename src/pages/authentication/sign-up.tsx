@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Button, Card, Checkbox, Label, TextInput } from "flowbite-react";
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthContext";
 import LoadingPage from "../pages/loading";
 
@@ -12,7 +12,7 @@ const SignUpPage: React.FC = function () {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
-  const [acceptTerms, setAcceptTerms] = React.useState(false); // Assume you've defined a state to capture terms and conditions checkbox [optional]
+  const [acceptTerms, setAcceptTerms] = React.useState(false);
   const [error, setError] = React.useState("");
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -37,7 +37,10 @@ const SignUpPage: React.FC = function () {
       console.error("Sign up error:", result.error.message);
       setError(result.error.message);
     } else {
-      navigate("/");
+      // Retrieve the saved path from localStorage and navigate to it
+      const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
+      localStorage.removeItem('redirectAfterLogin'); // Clear the saved path after redirecting
+      navigate(redirectPath);
     }
   };
 
@@ -46,17 +49,20 @@ const SignUpPage: React.FC = function () {
   }
 
   if (user) {
-    navigate("/");
+    const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
+    localStorage.removeItem('redirectAfterLogin');
+    navigate(redirectPath); // Redirect to the saved path if the user is already signed in
   }
+
 
   return (
     <div className="flex flex-col items-center justify-center px-6 lg:h-screen lg:gap-y-12">
-      <a href="/" className="my-6 flex items-center gap-x-1 lg:my-0">
+      {/* <a href="/" className="my-6 flex items-center gap-x-1 lg:my-0">
         <img alt="Logo" src="../../images/logo.svg" className="mr-3 h-10" />
         <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
           NM Chatbot Gen
         </span>
-      </a>
+      </a> */}
       <Card
         horizontal
         imgSrc="/images/authentication/create-account.jpg"

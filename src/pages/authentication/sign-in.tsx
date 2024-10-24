@@ -2,23 +2,21 @@
 import { Button, Card, Label, TextInput } from "flowbite-react";
 import type { FC } from "react";
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import LoadingPage from "../pages/loading";
 import { useAuthContext } from "../../context/AuthContext";
 
+const SignInPage: React.FC = function () {
+  const navigate = useNavigate();
+  const { signIn, user, loading } = useAuthContext();
 
-const SignInPage: FC = function () {
-  const navigate = useNavigate(); // Use useNavigate from react-router-dom
-  const { signIn, user, loading } = useAuthContext(); // Use signIn from useSupabaseAuth
-
-  // Assume you've defined a state htmlFor email and password to capture form inputs
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [error, setError] = React.useState(''); // Assume you've defined a state to capture errors [optional]
+  const [error, setError] = React.useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent default form submission behavior
-    const email = username
+    const email = username;
     const result = await signIn(email, password);
 
     // Handle sign-in errors
@@ -26,19 +24,24 @@ const SignInPage: FC = function () {
       console.error('Sign in error:', result.error.message);
       setError(result.error.message);
     } else {
-      navigate('/'); // Redirect to dashboard after successful sign-in
+      // Retrieve the saved path from localStorage and navigate to it
+      const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
+      localStorage.removeItem('redirectAfterLogin'); // Clear the saved path after redirecting
+      navigate(redirectPath);
     }
-  }
+  };
 
   if (loading) {
     return <LoadingPage />;
   } else if (user) {
-    navigate('/'); // Redirect to dashboard if user is already signed in
+    const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
+    localStorage.removeItem('redirectAfterLogin');
+    navigate(redirectPath); // Redirect to the saved path if the user is already signed in
   }
-
+  
   return (
     <div className="flex flex-col items-center justify-center px-6 lg:h-screen lg:gap-y-12">
-      <a href="/" className="my-6 flex items-center gap-x-1 lg:my-0">
+      {/* <a href="/" className="my-6 flex items-center gap-x-1 lg:my-0">
         <img
           alt="Logo"
           src="../../images/logo.svg"
@@ -47,7 +50,7 @@ const SignInPage: FC = function () {
         <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
           NM Chatbot Gen
         </span>
-      </a>
+      </a> */}
       <Card
         horizontal
         imgSrc="/images/authentication/login.jpg"
