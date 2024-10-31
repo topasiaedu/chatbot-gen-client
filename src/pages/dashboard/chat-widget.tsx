@@ -6,6 +6,7 @@ import Markdown from "markdown-to-jsx";
 import animationData from "./loading.json"; // Import your Lottie JSON file
 import "./chat-widget.css";
 import Lottie from "lottie-react";
+import TypingEffect from "../../components/TypingEffect";
 
 const ChatWidget: React.FC = () => {
   const { bot_model_id } = useParams<{ bot_model_id: string }>();
@@ -17,11 +18,11 @@ const ChatWidget: React.FC = () => {
   const [loading, setLoading] = useState(true); // State to control loading screen
   const messageEndRef = useRef<HTMLDivElement | null>(null);
   const { bots } = useBotContext();
+  const [botImage, setBotImage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (bot_model_id) {
-      console.log("Bot model ID:", bot_model_id);
-    }
+    // if (bot_model_id) {
+    // }
     // Simulate loading for 2 seconds
     const loadingTimer = setTimeout(() => {
       setLoading(false);
@@ -35,6 +36,13 @@ const ChatWidget: React.FC = () => {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  useEffect(() => {
+    if (bot_model_id) {
+      setBotImage(bots.find((bot) => bot.id === bot_model_id)?.img || null);
+      console.log("Bot Image:", botImage);
+    }
+  }, [botImage, bot_model_id, bots]);
 
   useEffect(() => {
     scrollToBottom();
@@ -92,12 +100,17 @@ const ChatWidget: React.FC = () => {
 
     await streamResponse(botResponse.completion);
   };
-  
+
   if (loading) {
     return (
       <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4 dark:bg-gray-900">
         {/* Lottie Animation */}
-        <Lottie animationData={animationData} loop autoplay style={{ width: 200, height: 200 }} />
+        <Lottie
+          animationData={animationData}
+          loop
+          autoplay
+          style={{ width: 200, height: 200 }}
+        />
       </div>
     );
   }
@@ -105,12 +118,22 @@ const ChatWidget: React.FC = () => {
   if (messages.length === 0) {
     return (
       <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4 dark:bg-gray-900">
-        <div className="flex items-center w-full max-w-md mb-6 justify-center space-x-3">
+        <div className="flex flex-col w-full max-w-7xl mb-6 space-x-3 items-center justify-center">
           <div className="text-2xl font-semibold text-gray-900 dark:text-white">
-            Start chatting with{" "}
-            {bots.find((bot) => bot.id === bot_model_id)?.name || "the bot"}!
+            Hi there,{" "}
+            {bots.find((bot) => bot.id === bot_model_id)?.name || "the bot"}{" "}
+            here!
           </div>
-          <DarkThemeToggle />
+
+          <div className="text-gray-500 dark:text-gray-300 text-center">
+            <TypingEffect
+              text={
+                bots.find((bot) => bot.id === bot_model_id)?.short_desc ||
+                "I'm a bot!"
+              }
+              speed={25}
+            />
+          </div>
         </div>
         <div className="flex items-center space-x-3 w-full max-w-md">
           <TextInput
@@ -128,27 +151,34 @@ const ChatWidget: React.FC = () => {
             className="font-medium">
             Send
           </Button>
+          <DarkThemeToggle />
         </div>
       </div>
     );
   }
-
   return (
     <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4 dark:bg-gray-900">
-      <div className="flex flex-col h-full w-full mx-auto">
-        <div className="flex items-center justify-between p-4 bg-white shadow-sm dark:bg-gray-800">
-          <div className="text-xl font-semibold text-gray-900 dark:text-white">
-            {bots.find((bot) => bot.id === bot_model_id)?.name || "Bot"}
-          </div>
-          <DarkThemeToggle />
+      <div className="flex flex-col h-full w-full mx-auto max-w-5xl">
+        <div className="text-2xl font-semibold text-gray-900 text-center header-text">
+          {bots.find((bot) => bot.id === bot_model_id)?.name || "Bot"}
         </div>
+
+        {/* <DarkThemeToggle /> */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((msg, index) => (
             <div
               key={index}
               className={`flex ${
                 msg.sender === "user" ? "justify-end" : "justify-start"
-              }`}>
+              } space-x-3`}>
+              {msg.sender !== "user" && botImage && (
+                <img
+                  src={botImage}
+                  alt="Bot Profile"
+                  // Image should be at the bottom of the message bubble
+                  className="w-8 h-8 rounded-full"
+                />
+              )}
               <div
                 className={`rounded-lg px-4 py-2 max-w-7xl ${
                   msg.sender === "user"
@@ -166,11 +196,18 @@ const ChatWidget: React.FC = () => {
               </div>
             </div>
           ))}
-          {botIsThinking && (
-            <div className="flex justify-start">
-              <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse"></div>
+          {botIsThinking && botImage && (
+            <div className="flex justify-start items-center space-x-3">
+              <img
+                src={botImage}
+                alt="Bot Profile"
+                className="w-8 h-8 rounded-full" // Smaller, circular profile image
+              />
               <div className="rounded-lg px-4 py-2 max-w-xs text-gray-900 dark:text-white">
-                <em>Bot is thinking...</em>
+                <em>
+                  {bots.find((bot) => bot.id === bot_model_id)?.name || "Bot"}{" "}
+                  is thinking...
+                </em>
               </div>
             </div>
           )}

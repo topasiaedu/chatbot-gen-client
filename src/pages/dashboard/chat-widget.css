@@ -146,3 +146,20 @@
 .dark-mode .send-button {
   background-color: #1a73e8;
 }
+.header-text {
+  color: transparent;
+  background: linear-gradient(to right, #8135EE, #F64E03, #FCC101, #F64E03, #8135EE);
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text; /* Safari and Chrome support */
+  animation: gradientAnimation 60s linear infinite;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}

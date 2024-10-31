@@ -46,24 +46,35 @@ export type Database = {
       }
       bot_models: {
         Row: {
+          bot_id: string | null
           created_at: string
           id: string
           open_ai_id: string
           version: string
         }
         Insert: {
+          bot_id?: string | null
           created_at?: string
           id?: string
           open_ai_id: string
           version: string
         }
         Update: {
+          bot_id?: string | null
           created_at?: string
           id?: string
           open_ai_id?: string
           version?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "bot_models_bot_id_fkey"
+            columns: ["bot_id"]
+            isOneToOne: false
+            referencedRelation: "bots"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bots: {
         Row: {
@@ -71,33 +82,39 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          img: string | null
           name: string
           progress: number | null
+          short_desc: string | null
           status: string | null
-          training_breadth: number | null
-          training_depth: number | null
+          training_breadth: number
+          training_depth: number
         }
         Insert: {
           active_version?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          img?: string | null
           name: string
           progress?: number | null
+          short_desc?: string | null
           status?: string | null
-          training_breadth?: number | null
-          training_depth?: number | null
+          training_breadth?: number
+          training_depth?: number
         }
         Update: {
           active_version?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          img?: string | null
           name?: string
           progress?: number | null
+          short_desc?: string | null
           status?: string | null
-          training_breadth?: number | null
-          training_depth?: number | null
+          training_breadth?: number
+          training_depth?: number
         }
         Relationships: [
           {
@@ -205,4 +222,19 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

@@ -11,6 +11,7 @@ import {
   FileInput,
   Badge,
   Progress,
+  Tabs,
 } from "flowbite-react";
 import { IoIosAdd } from "react-icons/io";
 import { BotFile, useBotFileContext } from "../context/BotFileContext";
@@ -23,6 +24,7 @@ const DashboardPage: React.FC = () => {
   const { bots, selectedBot, setSelectedBot, createBot, updateBot } =
     useBotContext();
   const { botFiles, createBotFile, deleteBotFile } = useBotFileContext();
+  const [profileImage, setProfileImage] = React.useState<File | null>(null);
   const [createBotBool, setCreateBotBool] = React.useState(false);
   const [files, setFiles] = React.useState<FileList | null>(null);
   const { showAlert } = useAlertContext();
@@ -31,6 +33,8 @@ const DashboardPage: React.FC = () => {
   const [botData, setBotData] = React.useState({
     name: "",
     description: "",
+    short_desc: "",
+    img: "",
     training_depth: 1,
     training_breadth: 1000,
     status: "DRAFT",
@@ -42,6 +46,8 @@ const DashboardPage: React.FC = () => {
       setBotData({
         name: selectedBot.name,
         description: selectedBot.description || "",
+        short_desc: selectedBot.short_desc || "",
+        img: selectedBot.img || "",
         training_depth: selectedBot.training_depth || 1,
         training_breadth: selectedBot.training_breadth || 1000,
         status: selectedBot.status || "DRAFT",
@@ -51,6 +57,8 @@ const DashboardPage: React.FC = () => {
       setBotData({
         name: "",
         description: "",
+        short_desc: "",
+        img: "",
         training_depth: 1,
         training_breadth: 1000,
         status: "DRAFT",
@@ -71,6 +79,34 @@ const DashboardPage: React.FC = () => {
     } else {
       const newBot = await createBot(botData);
       newBotId = newBot.id;
+    }
+
+    // Handle profile image
+    if (profileImage) {
+      const extension = profileImage.name.split(".").pop();
+      const randomId =
+        Math.random().toString(36).substring(7) + "." + extension;
+
+      // Upload into supabase first
+      const { data, error } = await supabase.storage
+        .from("bot_files")
+        .upload(randomId, profileImage);
+
+      if (error) {
+        console.error("Error uploading file:", error);
+        console.error("Data:", data);
+        showAlert("Error uploading file", "error");
+        return;
+      }
+
+      // Update bot with the image url
+      await updateBot({
+        ...botData,
+        id: selectedBot ? selectedBot.id : newBotId,
+        img:
+          "https://ldemovdvrlzrneitmwez.supabase.co/storage/v1/object/public/bot_files/" +
+          randomId,
+      });
     }
 
     // Handle files
@@ -102,6 +138,8 @@ const DashboardPage: React.FC = () => {
         });
       }
     }
+
+    showAlert("Bot saved successfully", "success");
   };
 
   const startTrainingBot = async () => {
@@ -206,150 +244,176 @@ const DashboardPage: React.FC = () => {
                       : "No Active Version"}
                   </Badge>
                 </div>
+                <Tabs aria-label="Default tabs">
+                  <Tabs.Item active title="Bot Information">
+                    <div>
+                      <Label htmlFor="botName">Bot Name</Label>
+                      <TextInput
+                        id="botName"
+                        name="botName"
+                        placeholder="My Awesome Chat Bot"
+                        value={botData.name}
+                        onChange={(e) =>
+                          setBotData({ ...botData, name: e.target.value })
+                        }
+                      />
+                    </div>
 
-                <div>
-                  <Label htmlFor="botName">Bot Name</Label>
-                  <TextInput
-                    id="botName"
-                    name="botName"
-                    placeholder="My Awesome Chat Bot"
-                    value={botData.name}
-                    onChange={(e) =>
-                      setBotData({ ...botData, name: e.target.value })
-                    }
-                  />
-                </div>
+                    <div>
+                      <Label htmlFor="botShortDescription">
+                        Bot Description
+                      </Label>
+                      <TextInput
+                        id="botShortDescription"
+                        name="botShortDescription"
+                        placeholder="A brief description of the bot"
+                        value={botData.short_desc}
+                        onChange={(e) =>
+                          setBotData({
+                            ...botData,
+                            short_desc: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="botDescription">Bot Instruction</Label>
+                      <TextInput
+                        id="botDescription"
+                        name="botDescription"
+                        placeholder="A brief description of the bot"
+                        value={botData.description}
+                        onChange={(e) =>
+                          setBotData({
+                            ...botData,
+                            description: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="botImage">Bot Image</Label>
+                      <FileInput
+                        id="botImage"
+                        name="botImage"
+                        onChange={(e) => {
+                          if (e.target.files)
+                            setProfileImage(e.target.files[0]);
+                        }}
+                      />
+                    </div>
+                  </Tabs.Item>
+                  <Tabs.Item active title="Bot Information">
 
-                <div>
-                  <Label htmlFor="botDescription">Bot Description</Label>
-                  <TextInput
-                    id="botDescription"
-                    name="botDescription"
-                    placeholder="A brief description of the bot"
-                    value={botData.description}
-                    onChange={(e) =>
-                      setBotData({ ...botData, description: e.target.value })
-                    }
-                  />
-                </div>
+                    <div>
+                      <Label htmlFor="trainingDepth">Training Depth</Label>
+                      <Select
+                        id="trainingDepth"
+                        name="trainingDepth"
+                        value={botData.training_depth}
+                        onChange={(e) =>
+                          setBotData({
+                            ...botData,
+                            training_depth: parseInt(e.target.value),
+                          })
+                        }>
+                        {/* 1-30 */}
+                        {Array.from({ length: 30 }, (_, i) => (
+                          <option key={i + 1} value={i + 1}>
+                            {i + 1}
+                          </option>
+                        ))}
+                      </Select>
+                      {/* Small note saying that the higher the training depth the more expensive it is to train the bot or generate the dataset */}
+                      <p className="text-xs text-gray-500">
+                        The higher the training depth the more expensive it is
+                        to train the bot or generate the dataset (default is 1)
+                      </p>
+                    </div>
 
-                {/* Create a divider */}
-                <div className="border-t border-gray-200 my-4"></div>
+                    <div>
+                      <Label htmlFor="trainingBreadth">Training Breadth</Label>
+                      <Select
+                        id="trainingBreadth"
+                        name="trainingBreadth"
+                        value={botData.training_breadth}
+                        onChange={(e) =>
+                          setBotData({
+                            ...botData,
+                            training_breadth: parseInt(e.target.value),
+                          })
+                        }>
+                        {/* 100, 200, 500, 1000, 2000, 5000 */}
+                        {[100, 200, 500, 1000, 2000, 5000].map((value) => (
+                          <option key={value} value={value}>
+                            {value}
+                          </option>
+                        ))}
+                      </Select>
 
-                {/* Training Settings */}
-                <div>
-                  <h2 className="intro-y text-lg font-medium">
-                    Training Settings
-                  </h2>
-                </div>
+                      {/* Small note saying that the higher the training breadth the less expensive it is to train the bot or generate the dataset, recommended 1000, but it will be less accurate the higher it is */}
+                      <p className="text-xs text-gray-500">
+                        The higher the training breadth the less expensive it is
+                        to train the bot or generate the dataset, recommended
+                        1000, but it will be less accurate the higher it is
+                      </p>
+                    </div>
+                  </Tabs.Item>
+                  <Tabs.Item active title="Bot Information">
 
-                <div>
-                  <Label htmlFor="trainingDepth">Training Depth</Label>
-                  <Select
-                    id="trainingDepth"
-                    name="trainingDepth"
-                    value={botData.training_depth}
-                    onChange={(e) =>
-                      setBotData({
-                        ...botData,
-                        training_depth: parseInt(e.target.value),
-                      })
-                    }>
-                    {/* 1-30 */}
-                    {Array.from({ length: 30 }, (_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {i + 1}
-                      </option>
-                    ))}
-                  </Select>
-                  {/* Small note saying that the higher the training depth the more expensive it is to train the bot or generate the dataset */}
-                  <p className="text-xs text-gray-500">
-                    The higher the training depth the more expensive it is to
-                    train the bot or generate the dataset (default is 1)
-                  </p>
-                </div>
-
-                <div>
-                  <Label htmlFor="trainingBreadth">Training Breadth</Label>
-                  <Select
-                    id="trainingBreadth"
-                    name="trainingBreadth"
-                    value={botData.training_breadth}
-                    onChange={(e) =>
-                      setBotData({
-                        ...botData,
-                        training_breadth: parseInt(e.target.value),
-                      })
-                    }>
-                    {/* 100, 200, 500, 1000, 2000, 5000 */}
-                    {[100, 200, 500, 1000, 2000, 5000].map((value) => (
-                      <option key={value} value={value}>
-                        {value}
-                      </option>
-                    ))}
-                  </Select>
-
-                  {/* Small note saying that the higher the training breadth the less expensive it is to train the bot or generate the dataset, recommended 1000, but it will be less accurate the higher it is */}
-                  <p className="text-xs text-gray-500">
-                    The higher the training breadth the less expensive it is to
-                    train the bot or generate the dataset, recommended 1000, but
-                    it will be less accurate the higher it is
-                  </p>
-                </div>
-
-                {/* Divider */}
-                <div className="border-t border-gray-200 my-4"></div>
-
-                {/* Training Data */}
-                <div className="flex justify-between items-center">
-                  <h2 className="intro-y text-lg font-medium">Training Data</h2>
-                  <FileInput
-                    id="botFiles"
-                    name="botFiles"
-                    multiple
-                    onChange={(e) => {
-                      setFiles(e.target.files);
-                    }}
-                  />
-                </div>
-                <div className="grid grid-cols-4 gap-4">
-                  {files &&
-                    Array.from(files)
-                      .filter(
-                        // Check if there is duplicate name with botFiles
-                        (file) =>
-                          !botFiles.some(
-                            (botFile) => botFile.file_name === file.name
+                    {/* Training Data */}
+                    <div className="flex justify-between items-center">
+                      <h2 className="intro-y text-lg font-medium">
+                        Training Data
+                      </h2>
+                      <FileInput
+                        id="botFiles"
+                        name="botFiles"
+                        multiple
+                        onChange={(e) => {
+                          setFiles(e.target.files);
+                        }}
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 gap-4">
+                      {files &&
+                        Array.from(files)
+                          .filter(
+                            // Check if there is duplicate name with botFiles
+                            (file) =>
+                              !botFiles.some(
+                                (botFile) => botFile.file_name === file.name
+                              )
                           )
-                      )
-                      .map((file) => (
-                        <div
-                          key={file.name}
-                          className="flex items-center p-4 bg-gray-100 dark:bg-gray-600 rounded-md">
-                          <div
-                            className="font-medium text-ellipsis text-sm
+                          .map((file) => (
+                            <div
+                              key={file.name}
+                              className="flex items-center p-4 bg-gray-100 dark:bg-gray-600 rounded-md">
+                              <div
+                                className="font-medium text-ellipsis text-sm
                           ">
-                            {file.name}
+                                {file.name}
+                              </div>
+                            </div>
+                          ))}
+                      {botFiles
+                        .filter((file) => file.bot_id === selectedBot?.id)
+                        .map((file) => (
+                          <div
+                            key={file.id}
+                            className="flex items-center p-4 bg-gray-100 dark:bg-gray-600 rounded-md">
+                            <div className="font-medium text-sm truncate w-full overflow-hidden whitespace-nowrap">
+                              {file.file_name}
+                            </div>
+                            <IoMdClose
+                              className="cursor-pointer text-red-500"
+                              onClick={() => handleDeleteBotFile(file)}
+                            />
                           </div>
-                        </div>
-                      ))}
-                  {botFiles
-                    .filter((file) => file.bot_id === selectedBot?.id)
-                    .map((file) => (
-                      <div
-                        key={file.id}
-                        className="flex items-center p-4 bg-gray-100 dark:bg-gray-600 rounded-md">
-                        <div className="font-medium text-sm truncate w-full overflow-hidden whitespace-nowrap">
-                          {file.file_name}
-                        </div>
-                        <IoMdClose
-                          className="cursor-pointer text-red-500"
-                          onClick={() => handleDeleteBotFile(file)}
-                        />
-                      </div>
-                    ))}
-                </div>
-
+                        ))}
+                    </div>
+                  </Tabs.Item>
+                </Tabs>
                 {/* Save Button */}
                 <div className="flex">
                   <Button size="sm" color="primary" onClick={handleSaveBot}>
