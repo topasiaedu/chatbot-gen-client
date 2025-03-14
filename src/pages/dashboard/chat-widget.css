@@ -24,7 +24,7 @@
   display: inline-block;
   padding: 12px 18px; /* More padding for a cleaner look */
   border-radius: 18px;
-  max-width: 80%; /* Ensure message bubbles don’t get too wide */
+  max-width: 80%; /* Ensure message bubbles don't get too wide */
   word-wrap: break-word;
   margin-bottom: 10px;
   font-size: 16px;
@@ -60,22 +60,303 @@
   margin: 0; /* Remove extra margins inside message content */
 }
 
-/* Bot is thinking animation */
-.bot-thinking {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 10px;
-  margin-left: 10px; /* Align with bot messages */
+/* ChatGPT-style markdown formatting */
+.markdown-content h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1.5rem 0 1rem 0;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 0.5rem;
 }
 
-.bot-thinking .dot {
-  background-color: #e5e5ea;
-  border-radius: 50%;
-  width: 8px;
-  height: 8px;
-  margin-right: 5px;
-  animation: bounce 1s infinite;
+.markdown-content h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 1.3rem 0 0.8rem 0;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 0.3rem;
+}
+
+.markdown-content h3, 
+.markdown-content h4, 
+.markdown-content h5, 
+.markdown-content h6 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.1rem 0 0.7rem 0;
+}
+
+.markdown-content p {
+  margin: 0.8rem 0;
+}
+
+.markdown-content ul, 
+.markdown-content ol {
+  margin: 0.8rem 0;
+  padding-left: 1.5rem;
+}
+
+.markdown-content li {
+  margin: 0.3rem 0;
+}
+
+.markdown-content blockquote {
+  margin: 1rem 0;
+  padding: 0.5rem 1rem;
+  border-left: 3px solid #d1d5db;
+  background-color: rgba(0, 0, 0, 0.05);
+  font-style: italic;
+}
+
+.markdown-content a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.dark-mode .markdown-content a {
+  color: #3b82f6;
+}
+
+.markdown-content a:hover {
+  text-decoration: none;
+}
+
+/* ChatGPT-style code blocks */
+.markdown-content pre {
+  background-color: #f6f8fa;
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  position: relative;
+}
+
+.dark-mode .markdown-content pre,
+.dark .markdown-content pre {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+
+/* Improved copy button for code blocks with interactive feedback */
+.copy-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 0.25rem;
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #666;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+  border: none;
+  outline: none;
+}
+
+.markdown-content pre:hover .copy-button {
+  opacity: 0.7;
+}
+
+.copy-button:hover {
+  opacity: 1 !important;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.copy-button:active {
+  transform: scale(0.95);
+}
+
+.dark-mode .copy-button,
+.dark .copy-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+}
+
+.dark-mode .copy-button:hover,
+.dark .copy-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ChatGPT-style inline code */
+.markdown-content code {
+  background-color: #f6f8fa;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9rem;
+}
+
+.dark-mode .markdown-content code,
+.dark .markdown-content code {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+}
+
+/* Fix code blocks inside pre - remove double styling */
+.markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+}
+
+/* PrismJS theme overrides to make it more like ChatGPT */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #6a737d;
+  font-style: italic;
+}
+
+.token.namespace {
+  opacity: 0.7;
+}
+
+.token.string,
+.token.attr-value {
+  color: #032f62;
+}
+
+.token.punctuation,
+.token.operator {
+  color: #24292e;
+}
+
+.token.entity,
+.token.url,
+.token.symbol,
+.token.number,
+.token.boolean,
+.token.variable,
+.token.constant,
+.token.property,
+.token.regex,
+.token.inserted {
+  color: #005cc5;
+}
+
+.token.atrule,
+.token.keyword,
+.token.attr-name,
+.language-autohotkey .token.selector {
+  color: #d73a49;
+}
+
+.token.function,
+.token.deleted,
+.language-autohotkey .token.tag {
+  color: #6f42c1;
+}
+
+.token.tag,
+.token.selector,
+.language-autohotkey .token.keyword {
+  color: #22863a;
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+/* Dark mode Prism overrides */
+.dark-mode .token.comment,
+.dark-mode .token.prolog,
+.dark-mode .token.doctype,
+.dark-mode .token.cdata,
+.dark .token.comment,
+.dark .token.prolog,
+.dark .token.doctype,
+.dark .token.cdata {
+  color: #8b949e;
+}
+
+.dark-mode .token.string,
+.dark-mode .token.attr-value,
+.dark .token.string,
+.dark .token.attr-value {
+  color: #a5d6ff;
+}
+
+.dark-mode .token.punctuation,
+.dark-mode .token.operator,
+.dark .token.punctuation,
+.dark .token.operator {
+  color: #c9d1d9;
+}
+
+.dark-mode .token.entity,
+.dark-mode .token.url,
+.dark-mode .token.symbol,
+.dark-mode .token.number,
+.dark-mode .token.boolean,
+.dark-mode .token.variable,
+.dark-mode .token.constant,
+.dark-mode .token.property,
+.dark-mode .token.regex,
+.dark-mode .token.inserted,
+.dark .token.entity,
+.dark .token.url,
+.dark .token.symbol,
+.dark .token.number,
+.dark .token.boolean,
+.dark .token.variable,
+.dark .token.constant,
+.dark .token.property,
+.dark .token.regex,
+.dark .token.inserted {
+  color: #79c0ff;
+}
+
+.dark-mode .token.atrule,
+.dark-mode .token.keyword,
+.dark-mode .token.attr-name,
+.dark .token.atrule,
+.dark .token.keyword,
+.dark .token.attr-name {
+  color: #ff7b72;
+}
+
+.dark-mode .token.function,
+.dark-mode .token.deleted,
+.dark .token.function,
+.dark .token.deleted {
+  color: #d2a8ff;
+}
+
+.dark-mode .token.tag,
+.dark-mode .token.selector,
+.dark .token.tag,
+.dark .token.selector {
+  color: #7ee787;
+}
+
+/* Line number styling (if used) */
+.line-numbers .line-numbers-rows {
+  border-right: 1px solid #ddd;
+}
+
+.dark-mode .line-numbers .line-numbers-rows,
+.dark .line-numbers .line-numbers-rows {
+  border-right: 1px solid #444;
+}
+
+.line-numbers-rows > span:before {
+  color: #999;
+}
+
+.dark-mode .line-numbers-rows > span:before,
+.dark .line-numbers-rows > span:before {
+  color: #666;
 }
 
 /* Input and button container */
@@ -116,6 +397,38 @@
   cursor: not-allowed;
 }
 
+/* Vibrant send button styles */
+.send-button-gradient {
+  background: linear-gradient(to right, #4f46e5, #3b82f6);
+  transition: all 0.3s ease;
+}
+
+.send-button-gradient:hover {
+  background: linear-gradient(to right, #4338ca, #2563eb);
+  transform: scale(1.05);
+}
+
+.send-button-gradient:active {
+  transform: scale(0.95);
+}
+
+/* Pulse animation for active send button */
+@keyframes pulse-blue {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(79, 70, 229, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+  }
+}
+
+.pulse-animation {
+  animation: pulse-blue 1.5s infinite;
+}
+
 /* Dark mode support */
 :root {
   --chat-bg: #f9f9f9;
@@ -146,6 +459,7 @@
 .dark-mode .send-button {
   background-color: #1a73e8;
 }
+
 .header-text {
   color: transparent;
   background: linear-gradient(to right, #8135EE, #F64E03, #FCC101, #F64E03, #8135EE);
@@ -153,6 +467,8 @@
   background-clip: text;
   -webkit-background-clip: text; /* Safari and Chrome support */
   animation: gradientAnimation 60s linear infinite;
+  letter-spacing: 0.025em;
+  font-weight: 600;
 }
 
 @keyframes gradientAnimation {
@@ -162,4 +478,140 @@
   100% {
     background-position: 100% 50%;
   }
+}
+
+/* Add the table styles after PrismJS styling */
+.dark-mode .line-numbers-rows > span:before,
+.dark .line-numbers-rows > span:before {
+  color: #666;
+}
+
+/* Table styling like ChatGPT */
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  overflow-x: auto;
+  display: block;
+}
+
+.markdown-content th {
+  background-color: #f6f8fa;
+  padding: 0.5rem;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid #e0e0e0;
+}
+
+.markdown-content td {
+  padding: 0.5rem;
+  border: 1px solid #e0e0e0;
+}
+
+.dark-mode .markdown-content th,
+.dark .markdown-content th {
+  background-color: #2d2d2d;
+  border-color: #444;
+}
+
+.dark-mode .markdown-content td,
+.dark .markdown-content td {
+  border-color: #444;
+}
+
+/* Bot is thinking animation */
+.bot-thinking {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px;
+  margin-left: 10px; /* Align with bot messages */
+}
+
+.bot-thinking .dot {
+  background-color: #e5e5ea;
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  margin-right: 5px;
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+/* Modern input field focus styles */
+.focus\:ring-2:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  outline: none;
+  border-color: transparent;
+}
+
+.dark .focus\:ring-2:focus {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5);
+}
+
+/* Smooth transitions */
+.transition-colors {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Modern scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4a5568;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #2d3748;
+}
+
+/* Improved shadows */
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.dark .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dark .shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.12);
 }
