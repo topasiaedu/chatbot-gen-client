@@ -652,7 +652,7 @@ const DashboardPage: React.FC = () => {
                             </div>
                           </div>
 
-                          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                          {/* <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
                             <h3 className="text-md font-medium mb-3">
                               Preview
                             </h3>
@@ -667,7 +667,7 @@ const DashboardPage: React.FC = () => {
                                 frameBorder="0"
                               />
                             </div>
-                          </div>
+                          </div> */}
                         </div>
                       </Tabs.Item>
                     )}

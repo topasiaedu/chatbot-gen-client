@@ -25,10 +25,16 @@ import "prismjs/themes/prism-tomorrow.css";
 /**
  * Custom code block component for enhanced markdown rendering with Prism.js
  */
-const CodeBlock = ({ children, className }: { children: string; className?: string }) => {
+const CodeBlock = ({
+  children,
+  className,
+}: {
+  children: string;
+  className?: string;
+}) => {
   const codeRef = useRef<HTMLElement>(null);
   const language = className ? className.replace("language-", "") : "";
-  
+
   // Apply Prism highlighting when component mounts or children change
   useEffect(() => {
     if (codeRef.current) {
@@ -39,7 +45,8 @@ const CodeBlock = ({ children, className }: { children: string; className?: stri
   // Function to copy code to clipboard
   const copyToClipboard = () => {
     if (navigator.clipboard && children) {
-      navigator.clipboard.writeText(children)
+      navigator.clipboard
+        .writeText(children)
         .then(() => {
           // Could add a toast or notification here
           console.log("Code copied to clipboard");
@@ -52,11 +59,10 @@ const CodeBlock = ({ children, className }: { children: string; className?: stri
 
   return (
     <pre className={`relative group ${className || ""}`}>
-      <button 
+      <button
         onClick={copyToClipboard}
         className="copy-button absolute top-2 right-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 
-        text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-      >
+        text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
         Copy
       </button>
       <code ref={codeRef} className={language ? `language-${language}` : ""}>
@@ -70,7 +76,11 @@ const CodeBlock = ({ children, className }: { children: string; className?: stri
  * Component for inline code rendering
  */
 const InlineCode = ({ children }: { children: React.ReactNode }) => {
-  return <code className="px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-mono text-sm">{children}</code>;
+  return (
+    <code className="px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-mono text-sm">
+      {children}
+    </code>
+  );
 };
 
 /**
@@ -94,10 +104,10 @@ const ChatWidget: React.FC = () => {
   const markdownOptions = {
     overrides: {
       pre: {
-        component: CodeBlock
+        component: CodeBlock,
       },
       code: {
-        component: InlineCode
+        component: InlineCode,
       },
       h1: {
         props: {
@@ -143,7 +153,8 @@ const ChatWidget: React.FC = () => {
       },
       blockquote: {
         props: {
-          className: "border-l-4 border-gray-300 dark:border-gray-600 pl-4 my-3 py-2 italic",
+          className:
+            "border-l-4 border-gray-300 dark:border-gray-600 pl-4 my-3 py-2 italic",
         },
       },
       hr: {
@@ -158,7 +169,8 @@ const ChatWidget: React.FC = () => {
       },
       th: {
         props: {
-          className: "border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-700",
+          className:
+            "border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-100 dark:bg-gray-700",
         },
       },
       td: {
@@ -205,30 +217,30 @@ const ChatWidget: React.FC = () => {
   const processMessageText = (message: string): string => {
     // Log the original message for debugging
     console.log("Original message:", message);
-    
+
     // Helper function to escape special markdown characters in numbers
     const escapeNumbersInText = (text: string): string => {
       // Find patterns like "number." at the end of sentences or followed by spaces
-      return text.replace(/(\d+)\.(?!\d)/g, '$1\\.');
+      return text.replace(/(\d+)\.(?!\d)/g, "$1\\.");
     };
-    
+
     // First, escape numbers that might be mistaken as list items
     let processedMessage = escapeNumbersInText(message);
-    
+
     // Then add spacing around actual list items that we want to keep as lists
     // Look for lines that start with a number followed by a period and a space
     processedMessage = processedMessage.replace(/^(\d+\.\s)/gm, "\n$1");
-    
+
     // Improve code block formatting
     // Make sure code blocks have proper language annotation and formatting
     processedMessage = processedMessage.replace(/```(\w+)?/g, (match, lang) => {
       if (!lang) return "```text";
       return match;
     });
-    
+
     // Log the processed message for debugging
     console.log("Processed message:", processedMessage);
-    
+
     return processedMessage;
   };
 
@@ -245,7 +257,7 @@ const ChatWidget: React.FC = () => {
 
       // Process the message for better formatting
       const fixedMessage = processMessageText(botMessage);
-      
+
       // Log the processed message that will be displayed
       console.log("Final message to be displayed:", fixedMessage);
 
@@ -304,10 +316,10 @@ const ChatWidget: React.FC = () => {
       setBotIsThinking(false);
       setMessages((prev) => [
         ...prev,
-        { 
-          text: "Sorry, I encountered an error processing your request. Please try again.", 
-          sender: "bot" 
-        }
+        {
+          text: "Sorry, I encountered an error processing your request. Please try again.",
+          sender: "bot",
+        },
       ]);
     }
   };
@@ -316,7 +328,7 @@ const ChatWidget: React.FC = () => {
   if (loading) {
     return (
       <div className="flex flex-col h-[100vh] justify-center items-center bg-gray-50 p-4 dark:bg-gray-900">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-8 border border-gray-200 dark:border-gray-700">
+        <div className="rounded-2xl p-8">
           <Lottie
             animationData={animationData}
             loop
@@ -335,7 +347,7 @@ const ChatWidget: React.FC = () => {
     return (
       <div className="flex flex-col h-[100vh] bg-gray-50 dark:bg-gray-900">
         {/* Header */}
-        <div className="sticky top-0 z-10 p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 backdrop-blur-sm bg-opacity-80 dark:bg-opacity-80">
+        <div className="sticky top-0 z-10 p-4 backdrop-blur-sm">
           <div className="relative flex items-center justify-center">
             <div className="text-xl font-semibold text-gray-900 dark:text-white text-center header-text">
               {bots.find((bot) => bot.id === bot_model_id)?.name || "Bot"}
@@ -347,7 +359,7 @@ const ChatWidget: React.FC = () => {
         </div>
 
         <div className="flex flex-col flex-1 justify-center items-center p-4">
-          <div className="flex flex-col w-full max-w-3xl mb-6 items-center justify-center bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col w-full max-w-3xl mb-6 items-center justify-center p-8 rounded-2xl shadow-sm">
             {botImage && (
               <img
                 src={botImage}
@@ -356,7 +368,7 @@ const ChatWidget: React.FC = () => {
               />
             )}
             <div className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-              Hi there, {" "}
+              Hi there,{" "}
               {bots.find((bot) => bot.id === bot_model_id)?.name || "the bot"}{" "}
               here!
             </div>
@@ -374,7 +386,7 @@ const ChatWidget: React.FC = () => {
         </div>
 
         {/* Input area */}
-        <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <div className="p-3">
           <div className="flex items-center space-x-3 max-w-3xl mx-auto relative">
             <TextInput
               type="text"
@@ -388,7 +400,9 @@ const ChatWidget: React.FC = () => {
             <Button
               color={input.trim() ? "primary" : "gray"}
               onClick={handleSend}
-              className={`absolute right-2 rounded-full w-8 h-8 flex items-center justify-center transition-colors duration-200 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white ${input.trim() ? 'pulse-animation' : ''}`}
+              className={`absolute right-2 rounded-full w-8 h-8 flex items-center justify-center transition-colors duration-200 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white ${
+                input.trim() ? "pulse-animation" : ""
+              }`}
               disabled={!input.trim()}>
               <svg
                 className="w-4 h-4"
@@ -406,7 +420,7 @@ const ChatWidget: React.FC = () => {
   return (
     <div className="flex flex-col h-[100vh] bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="sticky top-0 z-10 p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 backdrop-blur-sm bg-opacity-80 dark:bg-opacity-80">
+      <div className="sticky top-0 z-10 p-4 backdrop-blur-sm ">
         <div className="relative flex items-center justify-center">
           <div className="text-xl font-semibold text-gray-900 dark:text-white text-center header-text">
             {bots.find((bot) => bot.id === bot_model_id)?.name || "Bot"}
@@ -418,10 +432,9 @@ const ChatWidget: React.FC = () => {
       </div>
 
       {/* Messages */}
-      <div 
-        ref={messageContainerRef} 
-        className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6"
-      >
+      <div
+        ref={messageContainerRef}
+        className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
         {messages.map((msg, index) => (
           <div
             key={index}
@@ -463,9 +476,15 @@ const ChatWidget: React.FC = () => {
             )}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-2 shadow-sm">
               <div className="flex space-x-2">
-                <div className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                <div className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce" style={{ animationDelay: "300ms" }}></div>
-                <div className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce" style={{ animationDelay: "600ms" }}></div>
+                <div
+                  className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce"
+                  style={{ animationDelay: "0ms" }}></div>
+                <div
+                  className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce"
+                  style={{ animationDelay: "300ms" }}></div>
+                <div
+                  className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce"
+                  style={{ animationDelay: "600ms" }}></div>
               </div>
             </div>
           </div>
@@ -474,7 +493,7 @@ const ChatWidget: React.FC = () => {
       </div>
 
       {/* Input area */}
-      <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+      <div className="p-3">
         <div className="flex items-center space-x-3 max-w-3xl mx-auto relative">
           <TextInput
             type="text"
@@ -488,7 +507,9 @@ const ChatWidget: React.FC = () => {
           <Button
             color={input.trim() ? "primary" : "gray"}
             onClick={handleSend}
-            className={`absolute right-2 rounded-full w-8 h-8 flex items-center justify-center transition-colors duration-200 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white ${input.trim() ? 'pulse-animation' : ''}`}
+            className={`absolute right-2 rounded-full w-8 h-8 flex items-center justify-center transition-colors duration-200 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white ${
+              input.trim() ? "pulse-animation" : ""
+            }`}
             disabled={!input.trim()}>
             <svg
               className="w-4 h-4"
@@ -507,13 +528,15 @@ const ChatWidget: React.FC = () => {
 /**
  * Safely renders markdown content with error handling
  */
-const SafeMarkdown = ({ content, options }: { content: string; options: any }) => {
+const SafeMarkdown = ({
+  content,
+  options,
+}: {
+  content: string;
+  options: any;
+}) => {
   try {
-    return (
-      <Markdown options={options}>
-        {content}
-      </Markdown>
-    );
+    return <Markdown options={options}>{content}</Markdown>;
   } catch (error) {
     console.error("Error rendering markdown:", error);
     // If markdown rendering fails, return plain text
