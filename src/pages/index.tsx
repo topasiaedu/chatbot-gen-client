@@ -161,7 +161,7 @@ const DashboardPage: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ modelId: selectedBot?.id }),
+        body: JSON.stringify({ botId: selectedBot?.id }),
       });
 
       // Check if the response is successful
