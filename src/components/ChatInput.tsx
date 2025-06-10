@@ -1,4 +1,4 @@
-import React, { FormEvent, ChangeEvent } from "react";
+import React, { FormEvent, ChangeEvent, KeyboardEvent } from "react";
 
 /**
  * Props for the ChatInput component
@@ -34,6 +34,16 @@ const ChatInput = ({
     setInput(e.target.value);
   };
   
+  // Handle key down events
+  const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>): void => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (input.trim()) {
+        handleSend();
+      }
+    }
+  };
+  
   return (
     <form
       className="flex flex-col items-center w-full"
@@ -43,6 +53,7 @@ const ChatInput = ({
         <textarea
           value={input}
           onChange={onChange}
+          onKeyDown={onKeyDown}
           placeholder={placeholder}
           className="w-full rounded-2xl px-7 pr-16 py-6 text-lg focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white/90 dark:bg-gray-900/90 text-gray-900 dark:text-white shadow-md placeholder-gray-500 dark:placeholder-gray-400 font-sans resize-none"
           style={{ minHeight: "90px", boxShadow: "0 2px 8px 0 rgba(0,0,0,0.08)" }}

@@ -21,7 +21,7 @@ interface ChatMessageProps {
  * ChatMessage component displays a single message in the chat
  * with proper styling based on sender (user or bot)
  */
-const ChatMessage = ({ message, botImage }: ChatMessageProps): JSX.Element => {
+const ChatMessage = React.memo(({ message, botImage }: ChatMessageProps): JSX.Element => {
   const markdownOptions = getMarkdownOptions();
   const isUser = message.sender === "user";
   
@@ -53,6 +53,9 @@ const ChatMessage = ({ message, botImage }: ChatMessageProps): JSX.Element => {
       </div>
     </div>
   );
-};
+});
+
+// Add display name for debugging
+ChatMessage.displayName = "ChatMessage";
 
 export default ChatMessage; 

@@ -32,13 +32,13 @@ export const processMessageText = (message: string): string => {
  * 
  * @param botMessage - The message to display with typing effect
  * @param updateMessage - Function to update the message state
- * @param typingSpeed - Speed of typing effect in milliseconds (default: 10)
+ * @param typingSpeed - Speed of typing effect in milliseconds (default: 20)
  * @returns Promise that resolves when typing is complete
  */
 export const streamResponse = (
   botMessage: string,
   updateMessage: (text: string) => void,
-  typingSpeed: number = 1
+  typingSpeed: number = 20
 ): Promise<void> => {
   return new Promise<void>((resolve) => {
     let currentMessage = "";
@@ -47,11 +47,16 @@ export const streamResponse = (
     // Process the message for better formatting
     const fixedMessage = processMessageText(botMessage);
 
+    // Batch characters for smoother updates and less re-renders
+    const charsPerUpdate = Math.max(1, Math.floor(fixedMessage.length / 100)); // Adaptive batching
+
     const typingEffect = setInterval(() => {
       if (index < fixedMessage.length) {
-        currentMessage += fixedMessage[index];
+        // Add multiple characters at once for longer messages
+        const endIndex = Math.min(index + charsPerUpdate, fixedMessage.length);
+        currentMessage += fixedMessage.slice(index, endIndex);
         updateMessage(currentMessage);
-        index++;
+        index = endIndex;
       } else {
         clearInterval(typingEffect);
         resolve();

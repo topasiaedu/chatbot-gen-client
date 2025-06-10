@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useBotContext } from "../../context/BotContext";
 import { processMessageText, streamResponse } from "../../components/ChatMessageUtils";
@@ -37,7 +37,18 @@ const ChatWidget: React.FC = () => {
     if (bot_model_id) {
       setBotImage(bots.find((bot) => bot.id === bot_model_id)?.img || null);
     }
-  }, [botImage, bot_model_id, bots]);
+  }, [bot_model_id, bots]);
+
+  // Optimized update function for streaming messages
+  const updateLastMessage = useCallback((text: string) => {
+    setMessages((prev) => {
+      const updated = [...prev];
+      if (updated.length > 0) {
+        updated[updated.length - 1] = { ...updated[updated.length - 1], text };
+      }
+      return updated;
+    });
+  }, []);
 
   /**
    * Handles sending a message to the bot and processing its response
@@ -73,16 +84,11 @@ const ChatWidget: React.FC = () => {
       // Add empty bot message
       setMessages((prev) => [...prev, { text: "", sender: "bot" }]);
       
-      // Stream the response
+      // Stream the response with optimized update function
       await streamResponse(
         botResponse.completion, 
-        (text) => {
-          setMessages((prev) => {
-            const updatedMessages = [...prev];
-            updatedMessages[updatedMessages.length - 1].text = text;
-            return updatedMessages;
-          });
-        }
+        updateLastMessage,
+        20 // Increased typing speed to reduce re-renders (from 1ms to 20ms)
       );
     } catch (error) {
       console.error("Error sending message:", error);

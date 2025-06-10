@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import ChatMessage, { Message } from "./ChatMessage";
 import ThinkingIndicator from "./ThinkingIndicator";
@@ -20,7 +20,7 @@ const containerVariants: Variants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15,
+      staggerChildren: 0.05,
       when: "beforeChildren"
     }
   }
@@ -59,17 +59,30 @@ const ChatMessageList = ({
 }: ChatMessageListProps): JSX.Element => {
   const messageEndRef = useRef<HTMLDivElement | null>(null);
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Auto-scroll to the bottom when new messages are added
-  const scrollToBottom = (): void => {
-    if (messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+  // Optimized scroll function with debouncing
+  const scrollToBottom = useCallback((): void => {
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
     }
-  };
+    
+    scrollTimeoutRef.current = setTimeout(() => {
+      if (messageEndRef.current) {
+        messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 50); // Small delay to prevent excessive scrolling during streaming
+  }, []);
   
   useEffect(() => {
     scrollToBottom();
-  }, [messages, botIsThinking]);
+    
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [messages.length, botIsThinking, scrollToBottom]); // Only trigger on message count change, not content
   
   return (
     <motion.div
@@ -79,16 +92,16 @@ const ChatMessageList = ({
       initial="hidden"
       animate="visible"
     >
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {messages.map((message, index) => (
           <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
+            key={`${message.sender}-${index}`}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            exit={{ opacity: 0, y: -10 }}
             transition={{ 
-              duration: 0.3,
-              delay: index * 0.1 > 0.5 ? 0.5 : index * 0.1 // Cap delay at 0.5s
+              duration: 0.2,
+              delay: index < 3 ? index * 0.05 : 0
             }}
           >
             <ChatMessage 
@@ -101,10 +114,11 @@ const ChatMessageList = ({
         {/* Bot is thinking indicator */}
         {botIsThinking && (
           <motion.div
+            key="thinking-indicator"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2 }}
           >
             <ThinkingIndicator botImage={botImage} />
           </motion.div>

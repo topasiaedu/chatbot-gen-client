@@ -98,7 +98,7 @@ const ThinkingIndicator = ({ botImage }: ThinkingIndicatorProps): JSX.Element =>
           <motion.img
             src={botImage}
             alt="Bot Profile"
-            className="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 shadow-sm"
+            className="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 shadow-sm bg-purple-500"
             animate={{ 
               rotate: [0, -3, 0, 3, 0],
               scale: [1, 1.05, 1, 1.05, 1]
@@ -126,34 +126,34 @@ const ThinkingIndicator = ({ botImage }: ThinkingIndicatorProps): JSX.Element =>
         <div className="flex space-x-2">
           <motion.div
             variants={dotVariants}
-            animate={{ y: [0, -5, 0] }}
+            animate={{ y: [0, -8, 0] }}
             transition={{ 
-              duration: 0.6, 
+              duration: 1.2, 
               repeat: Infinity, 
               delay: 0,
-              ease: "easeInOut"
+              ease: [0.4, 0, 0.6, 1]
             }}
             className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500"
           ></motion.div>
           <motion.div
             variants={dotVariants}
-            animate={{ y: [0, -5, 0] }}
+            animate={{ y: [0, -8, 0] }}
             transition={{ 
-              duration: 0.6, 
+              duration: 1.2, 
               repeat: Infinity, 
-              delay: 0.2,
-              ease: "easeInOut"
+              delay: 0.15,
+              ease: [0.4, 0, 0.6, 1]
             }}
             className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500"
           ></motion.div>
           <motion.div
             variants={dotVariants}
-            animate={{ y: [0, -5, 0] }}
+            animate={{ y: [0, -8, 0] }}
             transition={{ 
-              duration: 0.6, 
+              duration: 1.2, 
               repeat: Infinity, 
-              delay: 0.4,
-              ease: "easeInOut"
+              delay: 0.3,
+              ease: [0.4, 0, 0.6, 1]
             }}
             className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500"
           ></motion.div>
