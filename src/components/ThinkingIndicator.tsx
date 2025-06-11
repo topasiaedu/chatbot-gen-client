@@ -126,34 +126,43 @@ const ThinkingIndicator = ({ botImage }: ThinkingIndicatorProps): JSX.Element =>
         <div className="flex space-x-2">
           <motion.div
             variants={dotVariants}
-            animate={{ y: [0, -8, 0] }}
+            animate={{ 
+              y: [0, -12, 0],
+              scale: [1, 1.2, 1]
+            }}
             transition={{ 
-              duration: 1.2, 
+              duration: 1.0, 
               repeat: Infinity, 
               delay: 0,
-              ease: [0.4, 0, 0.6, 1]
+              ease: [0.25, 0.46, 0.45, 0.94]
             }}
             className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500"
           ></motion.div>
           <motion.div
             variants={dotVariants}
-            animate={{ y: [0, -8, 0] }}
+            animate={{ 
+              y: [0, -12, 0],
+              scale: [1, 1.2, 1]
+            }}
             transition={{ 
-              duration: 1.2, 
+              duration: 1.0, 
               repeat: Infinity, 
-              delay: 0.15,
-              ease: [0.4, 0, 0.6, 1]
+              delay: 0.2,
+              ease: [0.25, 0.46, 0.45, 0.94]
             }}
             className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500"
           ></motion.div>
           <motion.div
             variants={dotVariants}
-            animate={{ y: [0, -8, 0] }}
+            animate={{ 
+              y: [0, -12, 0],
+              scale: [1, 1.2, 1]
+            }}
             transition={{ 
-              duration: 1.2, 
+              duration: 1.0, 
               repeat: Infinity, 
-              delay: 0.3,
-              ease: [0.4, 0, 0.6, 1]
+              delay: 0.4,
+              ease: [0.25, 0.46, 0.45, 0.94]
             }}
             className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500"
           ></motion.div>
