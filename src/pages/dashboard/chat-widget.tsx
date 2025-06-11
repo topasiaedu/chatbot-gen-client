@@ -8,7 +8,7 @@ import ChatMessageList from "../../components/ChatMessageList";
 import ChatInput from "../../components/ChatInput";
 import WelcomeScreen from "../../components/WelcomeScreen";
 import { Message } from "../../components/ChatMessage";
-import { DEFAULT_PRESET_PROMPTS } from "../../components/PresetPrompts";
+
 import "./chat-widget.css";
 
 /**
@@ -127,7 +127,6 @@ const ChatWidget: React.FC = () => {
       <WelcomeScreen
         botName={botName}
         botAvatar={botAvatar}
-        presetPrompts={DEFAULT_PRESET_PROMPTS}
         input={input}
         setInput={setInput}
         handleSend={handleSend}

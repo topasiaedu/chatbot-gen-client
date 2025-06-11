@@ -1,20 +1,11 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-
-/**
- * Type definition for a preset prompt
- */
-export type PresetPrompt = {
-  id: number;
-  title: string;
-  description: string;
-};
+import { getRandomQuestions, PresetQuestion } from "../constants/presetQuestions";
 
 /**
  * Props for the PresetPrompts component
  */
 interface PresetPromptsProps {
-  presets: ReadonlyArray<PresetPrompt>;
   onSelectPrompt: (prompt: string) => void;
 }
 
@@ -88,7 +79,10 @@ const arrowVariants = {
  * PresetPrompts component displays a list of preset questions or prompts
  * that users can select to start a conversation
  */
-const PresetPrompts = ({ presets, onSelectPrompt }: PresetPromptsProps): JSX.Element => {
+const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
+  // Generate random questions once using useMemo to avoid regenerating on every render
+  const randomQuestions = useMemo(() => getRandomQuestions(4), []);
+
   return (
     <motion.div 
       className="flex flex-row gap-6 justify-center items-center w-full max-w-6xl mb-10"
@@ -96,13 +90,13 @@ const PresetPrompts = ({ presets, onSelectPrompt }: PresetPromptsProps): JSX.Ele
       initial="hidden"
       animate="visible"
     >
-      {presets.map((prompt, idx) => (
+      {randomQuestions.map((question, idx) => (
         <motion.button
-          key={prompt.id}
+          key={`${question.text}-${idx}`}
           type="button"
-          onClick={() => onSelectPrompt(prompt.title)}
+          onClick={() => onSelectPrompt(question.text)}
           className="w-[220px] h-[300px] bg-white/70 dark:bg-gray-900/70 rounded-2xl shadow-lg p-6 flex flex-col justify-between hover:bg-white/90 dark:hover:bg-gray-900/90 transition-colors border border-gray-200 dark:border-gray-700 relative group focus:outline-none focus:ring-2 focus:ring-orange-400 font-sans backdrop-blur-sm"
-          aria-label={prompt.title}
+          aria-label={question.text}
           style={{ minWidth: "220px", minHeight: "300px" }}
           variants={cardVariants}
           whileHover="hover"
@@ -115,7 +109,7 @@ const PresetPrompts = ({ presets, onSelectPrompt }: PresetPromptsProps): JSX.Ele
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 + (idx * 0.1) }}
           >
-            {prompt.title}
+            {question.text}
           </motion.div>
           <motion.div 
             className="text-gray-600 dark:text-gray-300 text-sm mb-4 text-left"
@@ -123,7 +117,7 @@ const PresetPrompts = ({ presets, onSelectPrompt }: PresetPromptsProps): JSX.Ele
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 + (idx * 0.1) }}
           >
-            {prompt.description}
+            {question.description}
           </motion.div>
           <motion.div 
             className="absolute right-4 bottom-4 text-orange-500 group-hover:text-orange-600 transition-colors"
@@ -138,31 +132,5 @@ const PresetPrompts = ({ presets, onSelectPrompt }: PresetPromptsProps): JSX.Ele
     </motion.div>
   );
 };
-
-/**
- * Default preset prompts for Zi Wei Dou Shu
- */
-export const DEFAULT_PRESET_PROMPTS: ReadonlyArray<PresetPrompt> = [
-  {
-    id: 1,
-    title: "What is Zi Wei Dou Shu?",
-    description: "Learn the basics and history of Zi Wei Dou Shu (Purple Star Astrology).",
-  },
-  {
-    id: 2,
-    title: "What does my chart say about my wealth potential?",
-    description: "Explore your wealth palace and financial prospects using Zi Wei Dou Shu.",
-  },
-  {
-    id: 3,
-    title: "When is the best timing for important decisions?",
-    description: "Use Zi Wei Dou Shu to identify auspicious periods for major life choices.",
-  },
-  {
-    id: 4,
-    title: "Can you interpret my Zi Wei Dou Shu chart?",
-    description: "Get a personalized reading and understand your destiny map.",
-  },
-];
 
 export default PresetPrompts; 

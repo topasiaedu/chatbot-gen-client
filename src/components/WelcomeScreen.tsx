@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import PresetPrompts, { PresetPrompt } from "./PresetPrompts";
+import PresetPrompts from "./PresetPrompts";
 import ChatInput from "./ChatInput";
 import { DarkThemeToggle } from "flowbite-react";
 
@@ -10,7 +10,6 @@ import { DarkThemeToggle } from "flowbite-react";
 interface WelcomeScreenProps {
   botName: string;
   botAvatar: string;
-  presetPrompts: ReadonlyArray<PresetPrompt>;
   input: string;
   setInput: (value: string) => void;
   handleSend: () => void;
@@ -72,7 +71,6 @@ const avatarVariants = {
 const WelcomeScreen = ({
   botName,
   botAvatar,
-  presetPrompts,
   input,
   setInput,
   handleSend,
@@ -138,10 +136,7 @@ const WelcomeScreen = ({
 
         {/* Preset Prompt Cards */}
         <motion.div variants={itemVariants}>
-          <PresetPrompts
-            presets={presetPrompts}
-            onSelectPrompt={handlePresetQuestion}
-          />
+          <PresetPrompts onSelectPrompt={handlePresetQuestion} />
         </motion.div>
       </motion.div>
 
