@@ -127,7 +127,7 @@ const ThinkingIndicator = ({ botImage }: ThinkingIndicatorProps): JSX.Element =>
           <motion.div
             variants={dotVariants}
             animate={{ 
-              y: [0, -12, 0],
+              translateY: [0, -12, 0],
               scale: [1, 1.2, 1]
             }}
             transition={{ 
@@ -136,12 +136,13 @@ const ThinkingIndicator = ({ botImage }: ThinkingIndicatorProps): JSX.Element =>
               delay: 0,
               ease: [0.25, 0.46, 0.45, 0.94]
             }}
+            style={{ transformOrigin: "center" }}
             className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500"
           ></motion.div>
           <motion.div
             variants={dotVariants}
             animate={{ 
-              y: [0, -12, 0],
+              translateY: [0, -12, 0],
               scale: [1, 1.2, 1]
             }}
             transition={{ 
@@ -150,12 +151,13 @@ const ThinkingIndicator = ({ botImage }: ThinkingIndicatorProps): JSX.Element =>
               delay: 0.2,
               ease: [0.25, 0.46, 0.45, 0.94]
             }}
+            style={{ transformOrigin: "center" }}
             className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500"
           ></motion.div>
           <motion.div
             variants={dotVariants}
             animate={{ 
-              y: [0, -12, 0],
+              translateY: [0, -12, 0],
               scale: [1, 1.2, 1]
             }}
             transition={{ 
@@ -164,6 +166,7 @@ const ThinkingIndicator = ({ botImage }: ThinkingIndicatorProps): JSX.Element =>
               delay: 0.4,
               ease: [0.25, 0.46, 0.45, 0.94]
             }}
+            style={{ transformOrigin: "center" }}
             className="dot w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500"
           ></motion.div>
         </div>
