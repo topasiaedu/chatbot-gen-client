@@ -137,23 +137,27 @@ const ChatWidget: React.FC = () => {
 
   // Show chat interface if there are messages
   return (
-    <div className="flex flex-col min-h-screen w-full justify-between items-center bg-gray-100 dark:bg-gray-900 font-sans">
+    <div className="flex flex-col min-h-screen w-full justify-between items-center bg-gray-100 dark:bg-gray-900 font-sans px-2 sm:px-4">
       {/* Header */}
       <ChatHeader botName={botName} />
       
       {/* Messages */}
-      <ChatMessageList 
-        messages={messages} 
-        botImage={botImage} 
-        botIsThinking={botIsThinking} 
-      />
+      <div className="flex-1 w-full max-w-4xl mx-auto overflow-hidden">
+        <ChatMessageList 
+          messages={messages} 
+          botImage={botImage} 
+          botIsThinking={botIsThinking} 
+        />
+      </div>
       
       {/* Input area */}
-      <ChatInput 
-        input={input} 
-        setInput={setInput} 
-        handleSend={handleSend} 
-      />
+      <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 pb-4 sm:pb-6">
+        <ChatInput 
+          input={input} 
+          setInput={setInput} 
+          handleSend={handleSend} 
+        />
+      </div>
     </div>
   );
 };

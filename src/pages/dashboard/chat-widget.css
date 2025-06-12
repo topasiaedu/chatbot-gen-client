@@ -1,3 +1,14 @@
+/* Mobile viewport fix */
+* {
+  box-sizing: border-box;
+}
+
+/* Prevent horizontal scroll on mobile */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
 /* General container styling */
 .chat-container {
   display: flex;
@@ -5,31 +16,61 @@
   justify-content: space-between;
   height: 100vh;
   background-color: #f9f9f9;
-  padding: 16px; /* Add padding to overall chat container */
+  padding: 8px; /* Reduced padding for mobile */
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Mobile-first responsive design */
+@media (min-width: 640px) {
+  .chat-container {
+    padding: 16px;
+  }
 }
 
 /* Message container */
 .message-list {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 8px;
   background-color: var(--chat-bg, #ffffff);
   display: flex;
   flex-direction: column;
-  gap: 16px; /* Consistent gap between messages */
+  gap: 12px; /* Reduced gap for mobile */
+}
+
+/* Responsive message list padding */
+@media (min-width: 640px) {
+  .message-list {
+    padding: 16px;
+    gap: 16px;
+  }
 }
 
 /* Message bubble styling */
 .message-bubble {
   display: inline-block;
-  padding: 12px 18px; /* More padding for a cleaner look */
-  border-radius: 18px;
-  max-width: 80%; /* Ensure message bubbles don't get too wide */
+  padding: 10px 14px; /* Reduced padding for mobile */
+  border-radius: 16px;
+  max-width: 85%; /* Slightly wider on mobile for better space usage */
   word-wrap: break-word;
-  margin-bottom: 10px;
-  font-size: 16px;
-  line-height: 1.6rem; /* Increased line height for better readability */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow to mimic ChatGPT */
+  margin-bottom: 8px;
+  font-size: 14px; /* Smaller font size for mobile */
+  line-height: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive message bubble styling */
+@media (min-width: 640px) {
+  .message-bubble {
+    padding: 12px 18px;
+    border-radius: 18px;
+    max-width: 80%;
+    margin-bottom: 10px;
+    font-size: 16px;
+    line-height: 1.6rem;
+  }
 }
 
 /* User message bubble */
@@ -37,9 +78,17 @@
   align-self: flex-end;
   background-color: #0084ff;
   color: white;
-  margin-right: 10px;
+  margin-right: 8px;
   border-bottom-right-radius: 0;
-  margin-left: 40px; /* Add some space between user and bot messages */
+  margin-left: 20px; /* Reduced space for mobile */
+}
+
+/* Responsive user message styling */
+@media (min-width: 640px) {
+  .user-message {
+    margin-right: 10px;
+    margin-left: 40px;
+  }
 }
 
 /* Bot message bubble */
@@ -47,9 +96,17 @@
   align-self: flex-start;
   background-color: #e5e5ea;
   color: black;
-  margin-left: 10px;
+  margin-left: 8px;
   border-bottom-left-radius: 0;
-  margin-right: 40px; /* Add space for bot messages from the right */
+  margin-right: 20px; /* Reduced space for mobile */
+}
+
+/* Responsive bot message styling */
+@media (min-width: 640px) {
+  .bot-message {
+    margin-left: 10px;
+    margin-right: 40px;
+  }
 }
 
 /* Markdown content styling */

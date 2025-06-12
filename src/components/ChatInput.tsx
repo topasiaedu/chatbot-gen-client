@@ -145,35 +145,36 @@ const ChatInput = ({
         <button
           type="button"
           onClick={togglePresetQuestions}
-          className="absolute top-[-50px] right-4 z-10 flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors duration-200 text-sm font-medium">
-          <span className="text-base">💡</span>
-          Frequently Asked Questions
+          className="absolute top-[-45px] sm:top-[-50px] right-2 sm:right-4 z-10 flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors duration-200 text-xs sm:text-sm font-medium">
+          <span className="text-sm sm:text-base">💡</span>
+          <span className="hidden sm:inline">Frequently Asked Questions</span>
+          <span className="sm:hidden">FAQ</span>
         </button>
 
-        <div className="relative w-full px-4 py-4">
+        <div className="relative w-full px-3 sm:px-4 py-3 sm:py-4">
           <textarea
             value={input}
             onChange={onChange}
             onKeyDown={onKeyDown}
             placeholder={placeholder}
-            className="w-full rounded-2xl px-7 pr-16 py-6 text-lg focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white/90 dark:bg-gray-900/90 text-gray-900 dark:text-white shadow-md placeholder-gray-500 dark:placeholder-gray-400 font-sans resize-none"
+            className="w-full rounded-xl sm:rounded-2xl px-4 sm:px-7 pr-12 sm:pr-16 py-4 sm:py-6 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white/90 dark:bg-gray-900/90 text-gray-900 dark:text-white shadow-md placeholder-gray-500 dark:placeholder-gray-400 font-sans resize-none"
             style={{
-              minHeight: "90px",
+              minHeight: "70px",
               boxShadow: "0 2px 8px 0 rgba(0,0,0,0.08)",
             }}
             autoComplete="off"
             autoFocus={false}
-            rows={4}
+            rows={3}
           />
           <button
             type="submit"
             disabled={!input.trim()}
-            className={`absolute bottom-10 right-10 rounded-full w-12 h-12 flex items-center justify-center bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white shadow-lg transition-colors duration-200 ${
+            className={`absolute bottom-6 sm:bottom-10 right-6 sm:right-10 rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white shadow-lg transition-colors duration-200 ${
               !input.trim() ? "opacity-50 cursor-not-allowed" : ""
             }`}
             aria-label="Send">
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5 sm:w-6 sm:h-6"
               fill="currentColor"
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg">

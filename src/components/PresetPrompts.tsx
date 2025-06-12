@@ -85,7 +85,7 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
 
   return (
     <motion.div 
-      className="flex flex-row gap-6 justify-center items-center w-full max-w-6xl mb-10"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 w-full max-w-7xl mx-auto mb-3 sm:mb-4 lg:mb-6 px-2"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -95,16 +95,17 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
           key={`${question.text}-${idx}`}
           type="button"
           onClick={() => onSelectPrompt(question.text)}
-          className="w-[220px] h-[300px] bg-white/70 dark:bg-gray-900/70 rounded-2xl shadow-lg p-6 flex flex-col justify-between hover:bg-white/90 dark:hover:bg-gray-900/90 transition-colors border border-gray-200 dark:border-gray-700 relative group focus:outline-none focus:ring-2 focus:ring-orange-400 font-sans backdrop-blur-sm"
+          className={`w-full bg-white/70 dark:bg-gray-900/70 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 lg:p-6 flex flex-col justify-between hover:bg-white/90 dark:hover:bg-gray-900/90 transition-colors border border-gray-200 dark:border-gray-700 relative group focus:outline-none focus:ring-2 focus:ring-orange-400 font-sans backdrop-blur-sm min-h-[180px] sm:min-h-[220px] lg:min-h-[260px] ${
+            idx >= 2 ? "hidden sm:flex" : ""
+          }`}
           aria-label={question.text}
-          style={{ minWidth: "220px", minHeight: "300px" }}
           variants={cardVariants}
           whileHover="hover"
           whileTap="tap"
           custom={idx}
         >
           <motion.div 
-            className="font-semibold text-gray-900 dark:text-white text-base mb-2 text-left"
+            className="font-semibold text-gray-900 dark:text-white text-sm sm:text-base lg:text-base mb-2 text-left"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 + (idx * 0.1) }}
@@ -112,7 +113,7 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
             {question.text}
           </motion.div>
           <motion.div 
-            className="text-gray-600 dark:text-gray-300 text-sm mb-4 text-left"
+            className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-4 text-left flex-1"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 + (idx * 0.1) }}
@@ -120,10 +121,10 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
             {question.description}
           </motion.div>
           <motion.div 
-            className="absolute right-4 bottom-4 text-orange-500 group-hover:text-orange-600 transition-colors"
+            className="absolute right-3 sm:right-4 bottom-3 sm:bottom-4 text-orange-500 group-hover:text-orange-600 transition-colors"
             variants={arrowVariants}
           >
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <svg width="20" height="20" className="sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24">
               <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </motion.div>

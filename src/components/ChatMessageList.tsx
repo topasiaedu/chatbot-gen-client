@@ -87,7 +87,7 @@ const ChatMessageList = ({
   return (
     <motion.div
       ref={messageContainerRef}
-      className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 font-sans w-full max-h-[70vh] overflow-y-auto hide-scrollbar"
+      className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 font-sans w-full max-h-[75vh] overflow-y-auto hide-scrollbar"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
