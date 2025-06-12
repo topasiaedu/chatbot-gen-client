@@ -85,7 +85,7 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
 
   return (
     <motion.div 
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 w-full max-w-7xl mx-auto mb-3 sm:mb-4 lg:mb-6 px-2"
+      className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 w-full max-w-7xl mx-auto mb-6 sm:mb-8 lg:mb-10 px-2"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -95,9 +95,7 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
           key={`${question.text}-${idx}`}
           type="button"
           onClick={() => onSelectPrompt(question.text)}
-          className={`w-full bg-white/70 dark:bg-gray-900/70 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 lg:p-6 flex flex-col justify-between hover:bg-white/90 dark:hover:bg-gray-900/90 transition-colors border border-gray-200 dark:border-gray-700 relative group focus:outline-none focus:ring-2 focus:ring-orange-400 font-sans backdrop-blur-sm min-h-[180px] sm:min-h-[220px] lg:min-h-[260px] ${
-            idx >= 2 ? "hidden sm:flex" : ""
-          }`}
+          className="w-full bg-white/70 dark:bg-gray-900/70 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 lg:p-6 flex flex-col justify-between hover:bg-white/90 dark:hover:bg-gray-900/90 transition-colors border border-gray-200 dark:border-gray-700 relative group focus:outline-none focus:ring-2 focus:ring-orange-400 font-sans backdrop-blur-sm min-h-[200px] sm:min-h-[240px] lg:min-h-[280px]"
           aria-label={question.text}
           variants={cardVariants}
           whileHover="hover"
