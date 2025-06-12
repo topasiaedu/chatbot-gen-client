@@ -107,7 +107,7 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
   const isMobile = useIsMobile();
   
   // Generate random questions based on screen size: 2 for mobile, 4 for desktop
-  const randomQuestions = useMemo(() => getRandomQuestions(isMobile ? 2 : 4), [isMobile]);
+  const randomQuestions = useMemo(() => getRandomQuestions(isMobile ? 0 : 4), [isMobile]);
 
   return (
     <motion.div 
