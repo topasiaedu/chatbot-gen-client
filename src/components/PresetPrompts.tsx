@@ -111,7 +111,7 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
 
   return (
     <motion.div 
-      className={`flex flex-row gap-6 justify-center items-center w-full ${isMobile ? "max-w-lg" : "max-w-6xl"} mb-10`}
+      className={`flex ${isMobile ? "flex-col gap-3" : "flex-row gap-6"} justify-center items-center w-full ${isMobile ? "max-w-sm" : "max-w-6xl"} ${isMobile ? "mb-4" : "mb-10"}`}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -121,16 +121,20 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
           key={`${question.text}-${idx}`}
           type="button"
           onClick={() => onSelectPrompt(question.text)}
-          className="w-[220px] h-[300px] bg-white/70 dark:bg-gray-900/70 rounded-2xl shadow-lg p-6 flex flex-col justify-between hover:bg-white/90 dark:hover:bg-gray-900/90 transition-colors border border-gray-200 dark:border-gray-700 relative group focus:outline-none focus:ring-2 focus:ring-orange-400 font-sans backdrop-blur-sm"
+          className={`${
+            isMobile 
+              ? "w-full h-[120px] p-4" 
+              : "w-[220px] h-[300px] p-6"
+          } bg-white/70 dark:bg-gray-900/70 rounded-2xl shadow-lg flex flex-col justify-between hover:bg-white/90 dark:hover:bg-gray-900/90 transition-colors border border-gray-200 dark:border-gray-700 relative group focus:outline-none focus:ring-2 focus:ring-orange-400 font-sans backdrop-blur-sm`}
           aria-label={question.text}
-          style={{ minWidth: "220px", minHeight: "300px" }}
+          style={isMobile ? { minHeight: "120px" } : { minWidth: "220px", minHeight: "300px" }}
           variants={cardVariants}
           whileHover="hover"
           whileTap="tap"
           custom={idx}
         >
           <motion.div 
-            className="font-semibold text-gray-900 dark:text-white text-base mb-2 text-left"
+            className={`font-semibold text-gray-900 dark:text-white ${isMobile ? "text-sm" : "text-base"} mb-1 sm:mb-2 text-left ${isMobile ? "line-clamp-2" : ""}`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 + (idx * 0.1) }}
@@ -138,7 +142,7 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
             {question.text}
           </motion.div>
           <motion.div 
-            className="text-gray-600 dark:text-gray-300 text-sm mb-4 text-left"
+            className={`text-gray-600 dark:text-gray-300 ${isMobile ? "text-xs" : "text-sm"} ${isMobile ? "mb-2 line-clamp-3" : "mb-4"} text-left`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 + (idx * 0.1) }}
@@ -146,10 +150,10 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
             {question.description}
           </motion.div>
           <motion.div 
-            className="absolute right-4 bottom-4 text-orange-500 group-hover:text-orange-600 transition-colors"
+            className={`absolute ${isMobile ? "right-3 bottom-3" : "right-4 bottom-4"} text-orange-500 group-hover:text-orange-600 transition-colors`}
             variants={arrowVariants}
           >
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <svg width={isMobile ? "20" : "24"} height={isMobile ? "20" : "24"} fill="none" viewBox="0 0 24 24">
               <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </motion.div>
