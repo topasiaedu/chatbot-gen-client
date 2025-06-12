@@ -139,7 +139,7 @@ const ChatWidget: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen w-full justify-between items-center bg-gray-100 dark:bg-gray-900 font-sans px-2 sm:px-4">
       {/* Header */}
-      <ChatHeader botName={botName} />
+      {/* <ChatHeader botName={botName} /> */}
       
       {/* Messages */}
       <div className="flex-1 w-full max-w-4xl mx-auto overflow-hidden">

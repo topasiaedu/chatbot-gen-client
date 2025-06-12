@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import PresetPrompts from "./PresetPrompts";
 import ChatInput from "./ChatInput";
-import { DarkThemeToggle } from "flowbite-react";
 
 /**
  * Props for the WelcomeScreen component
@@ -78,17 +77,10 @@ const WelcomeScreen = ({
 }: WelcomeScreenProps): JSX.Element => {
   return (
     <motion.div
-      className="flex flex-col min-h-screen w-full justify-between items-center font-sans bg-gray-50 dark:bg-gray-900 px-3 sm:px-4 md:px-6"
+      className="flex flex-col min-h-screen w-full justify-between items-center font-sans bg-gray-50 px-3 sm:px-4 md:px-6"
       initial="hidden"
       animate="visible"
       variants={containerVariants}>
-      {/* Nav with DarkThemeToggle on the most right */}
-      <motion.div
-        className="flex justify-end w-full p-3 sm:p-4"
-        variants={itemVariants}>
-        <DarkThemeToggle />
-      </motion.div>
-
       {/* Header Section */}
       <motion.div
         className="flex flex-col items-center justify-center mb-4 sm:mb-6 md:mb-8 px-4 sm:px-6 flex-1"
@@ -106,7 +98,7 @@ const WelcomeScreen = ({
 
         {/* Headline */}
         <motion.div
-          className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white text-center mb-2 sm:mb-3 drop-shadow-lg px-2"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 text-center mb-2 sm:mb-3 drop-shadow-lg px-2"
           variants={itemVariants}>
           Hi there{" "}
           <motion.span
@@ -126,7 +118,7 @@ const WelcomeScreen = ({
 
         {/* Sub Headline */}
         <motion.div
-          className="text-sm sm:text-base md:text-lg text-gray-900 dark:text-white text-center max-w-xl sm:max-w-2xl mb-4 sm:mb-6 px-2"
+          className="text-sm sm:text-base md:text-lg text-gray-900 text-center max-w-xl sm:max-w-2xl mb-4 sm:mb-6 px-2"
           variants={itemVariants}>
           Start with one of the popular prompts below, or feel free to use your
           own to get started!

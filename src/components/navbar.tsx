@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import type { FC } from "react";
-import { Avatar, DarkThemeToggle, Dropdown, Navbar } from "flowbite-react";
+import { Avatar, Dropdown, Navbar } from "flowbite-react";
 import { HiSearch } from "react-icons/hi";
 import { useSidebarContext } from "../context/SidebarContext";
 import React from "react";
@@ -64,7 +64,6 @@ const ExampleNavbar: React.FC = function () {
               </button>
               {/* <NotificationBellDropdown /> */}
               {/* <AppDrawerDropdown /> */}
-              <DarkThemeToggle />
             </div>
             <div className="hidden lg:block">
               <UserDropdown />
