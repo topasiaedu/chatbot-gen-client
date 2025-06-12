@@ -123,7 +123,7 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
           onClick={() => onSelectPrompt(question.text)}
           className={`${
             isMobile 
-              ? "w-full h-[120px] p-4" 
+              ? "w-full h-[140px] p-4" 
               : "w-[220px] h-[300px] p-6"
           } bg-white/70 dark:bg-gray-900/70 rounded-2xl shadow-lg flex flex-col justify-between hover:bg-white/90 dark:hover:bg-gray-900/90 transition-colors border border-gray-200 dark:border-gray-700 relative group focus:outline-none focus:ring-2 focus:ring-orange-400 font-sans backdrop-blur-sm`}
           aria-label={question.text}
@@ -134,7 +134,13 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
           custom={idx}
         >
           <motion.div 
-            className={`font-semibold text-gray-900 dark:text-white ${isMobile ? "text-sm" : "text-base"} mb-1 sm:mb-2 text-left ${isMobile ? "line-clamp-2" : ""}`}
+            className={`font-semibold text-gray-900 dark:text-white ${isMobile ? "text-sm" : "text-base"} mb-1 sm:mb-2 text-left ${isMobile ? "overflow-hidden" : ""}`}
+            style={isMobile ? {
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              textOverflow: 'ellipsis'
+            } : {}}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 + (idx * 0.1) }}
@@ -142,7 +148,13 @@ const PresetPrompts = ({ onSelectPrompt }: PresetPromptsProps): JSX.Element => {
             {question.text}
           </motion.div>
           <motion.div 
-            className={`text-gray-600 dark:text-gray-300 ${isMobile ? "text-xs" : "text-sm"} ${isMobile ? "mb-2 line-clamp-3" : "mb-4"} text-left`}
+            className={`text-gray-600 dark:text-gray-300 ${isMobile ? "text-xs" : "text-sm"} ${isMobile ? "mb-2 overflow-hidden" : "mb-4"} text-left`}
+            style={isMobile ? {
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              textOverflow: 'ellipsis'
+            } : {}}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 + (idx * 0.1) }}
