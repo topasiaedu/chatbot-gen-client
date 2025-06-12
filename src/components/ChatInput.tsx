@@ -76,23 +76,25 @@ const ChatInput = ({
       {/* Preset Questions Modal */}
       {showPresetQuestions && (
         <div
-          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-2 sm:p-4"
           onClick={() => setShowPresetQuestions(false)}>
           <div
-            className="bg-white dark:bg-gray-800 rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-y-auto shadow-2xl"
+            className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl max-w-4xl w-full max-h-[85vh] sm:max-h-[80vh] overflow-y-auto shadow-2xl"
             onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
-            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 rounded-t-2xl">
+            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 rounded-t-xl sm:rounded-t-2xl">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  💡 Frequently Asked Questions
+                <h2 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-1 sm:gap-2">
+                  <span className="text-lg sm:text-xl">💡</span>
+                  <span className="hidden sm:inline">Frequently Asked Questions</span>
+                  <span className="sm:hidden">FAQ</span>
                 </h2>
                 <button
                   onClick={() => setShowPresetQuestions(false)}
                   className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
                   aria-label="Close">
                   <svg
-                    className="w-6 h-6"
+                    className="w-5 h-5 sm:w-6 sm:h-6"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24">
@@ -105,29 +107,29 @@ const ChatInput = ({
                   </svg>
                 </button>
               </div>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1 sm:mt-2">
                 Click any question to use it as your message
               </p>
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 space-y-8">
+            <div className="p-3 sm:p-6 space-y-4 sm:space-y-8">
               {PRESET_QUESTIONS.map((category, categoryIndex) => (
-                <div key={categoryIndex} className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                    <span className="text-xl">{category.icon}</span>
+                <div key={categoryIndex} className="space-y-2 sm:space-y-4">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-1 sm:gap-2">
+                    <span className="text-base sm:text-xl">{category.icon}</span>
                     {category.title}
                   </h3>
-                  <div className="grid gap-3">
+                  <div className="grid gap-2 sm:gap-3">
                     {category.questions.map((question, questionIndex) => (
                       <button
                         key={questionIndex}
                         onClick={() => handleQuestionSelect(question.text)}
-                        className="text-left p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-orange-50 dark:hover:bg-orange-900/20 border border-transparent hover:border-orange-200 dark:hover:border-orange-800 transition-all duration-200 group">
-                        <p className="text-gray-700 dark:text-gray-300 group-hover:text-orange-600 dark:group-hover:text-orange-400 leading-relaxed mb-2 font-medium">
+                        className="text-left p-3 sm:p-4 rounded-lg sm:rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-orange-50 dark:hover:bg-orange-900/20 border border-transparent hover:border-orange-200 dark:hover:border-orange-800 transition-all duration-200 group">
+                        <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 group-hover:text-orange-600 dark:group-hover:text-orange-400 leading-relaxed mb-1 sm:mb-2 font-medium">
                           &ldquo;{question.text}&rdquo;
                         </p>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                           {question.description}
                         </p>
                       </button>
