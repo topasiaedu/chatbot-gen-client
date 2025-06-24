@@ -26,7 +26,9 @@ import React from "react";
 import { BotProvider } from "./context/BotContext";
 import { BotFileProvider } from "./context/BotFileContext";
 import { BotModelProvider } from "./context/BotModelContext";
+import { ChatProvider } from "./context/ChatContext";
 import ChatWidget from "./pages/dashboard/chat-widget";
+import ChatAnalyticsPage from "./pages/dashboard/chat-analytics";
 
 const App: React.FC = () => (
   <AlertProvider>
@@ -34,7 +36,8 @@ const App: React.FC = () => (
       <BotProvider>
         <BotFileProvider>
           <BotModelProvider>
-            <AlertComponent />
+            <ChatProvider>
+              <AlertComponent />
             <BrowserRouter>
               <Routes>
                 <Route element={<FlowbiteWrapper />}>
@@ -52,6 +55,11 @@ const App: React.FC = () => (
                     <Route
                       path="/users/settings"
                       element={<UserSettingsPage />}
+                    />
+                    
+                    <Route
+                      path="/dashboard/chat-analytics"
+                      element={<ChatAnalyticsPage />}
                     />
                   </Route>
                   <Route
@@ -97,6 +105,7 @@ const App: React.FC = () => (
                 </Route>
               </Routes>
             </BrowserRouter>
+            </ChatProvider>
           </BotModelProvider>
         </BotFileProvider>
       </BotProvider>
