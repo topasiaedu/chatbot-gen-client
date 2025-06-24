@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useBotContext } from "../../context/BotContext";
 import { processMessageText, streamResponse } from "../../components/ChatMessageUtils";
 import LoadingScreen from "../../components/LoadingScreen";
@@ -17,12 +17,16 @@ import "./chat-widget.css";
  */
 const ChatWidget: React.FC = () => {
   const { bot_model_id } = useParams<{ bot_model_id: string }>();
+  const [searchParams] = useSearchParams();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [botIsThinking, setBotIsThinking] = useState(false);
   const [loading, setLoading] = useState(true);
   const { bots } = useBotContext();
   const [botImage, setBotImage] = useState<string | null>(null);
+  
+  // Extract email from URL query parameters
+  const email = searchParams.get("email");
 
   useEffect(() => {
     // Simulate loading for 2 seconds
@@ -71,6 +75,7 @@ const ChatWidget: React.FC = () => {
           botId: bot_model_id,
           prompt: messageToSend,
           messages: messages,
+          email: email,
         }),
       });
 
