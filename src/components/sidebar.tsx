@@ -2,7 +2,7 @@
 import classNames from "classnames";
 import { Sidebar } from "flowbite-react";
 import React, { useEffect, useState } from "react";
-import { HiChartPie, HiInformationCircle, HiChatAlt2 } from "react-icons/hi";
+import { HiChartPie, HiInformationCircle, HiChatAlt2, HiMicrophone, HiChat } from "react-icons/hi";
 import { useSidebarContext } from "../context/SidebarContext";
 import isSmallScreen from "../helpers/is-small-screen";
 
@@ -45,6 +45,24 @@ const ExampleSidebar: React.FC = function () {
                     "/dashboard/chat-analytics" === currentPage ? "bg-gray-100 dark:bg-gray-700" : ""
                   }>
                   Chat Analytics
+                </Sidebar.Item>
+
+                <Sidebar.Item
+                  href="/transcription"
+                  icon={HiMicrophone}
+                  className={
+                    "/transcription" === currentPage ? "bg-gray-100 dark:bg-gray-700" : ""
+                  }>
+                  Transcription
+                </Sidebar.Item>
+
+                <Sidebar.Item
+                  href="/transcription-chat"
+                  icon={HiChat}
+                  className={
+                    "/transcription-chat" === currentPage ? "bg-gray-100 dark:bg-gray-700" : ""
+                  }>
+                  Transcription Chat
                 </Sidebar.Item>
 
                 {/* </Sidebar.Collapse> */}

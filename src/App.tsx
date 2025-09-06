@@ -27,8 +27,16 @@ import { BotProvider } from "./context/BotContext";
 import { BotFileProvider } from "./context/BotFileContext";
 import { BotModelProvider } from "./context/BotModelContext";
 import { ChatProvider } from "./context/ChatContext";
+import { TranscriptionFolderProvider } from "./context/TranscriptionFolderContext";
+import { TranscriptionTaskProvider } from "./context/TranscriptionTaskContext";
+import { TranscriptionConversationProvider } from "./context/TranscriptionConversationContext";
+import { TranscriptionChatProvider } from "./context/TranscriptionChatContext";
+import { TranscriptionConversationChatProvider } from "./context/TranscriptionConversationChatContext";
 import ChatWidget from "./pages/dashboard/chat-widget";
 import ChatAnalyticsPage from "./pages/dashboard/chat-analytics";
+import TranscriptionPage from "./pages/transcription";
+import TranscriptionChatPage from "./pages/transcription/chat";
+import TranscriptionConversationChatPage from "./pages/transcription-chat";
 
 const App: React.FC = () => (
   <AlertProvider>
@@ -37,6 +45,11 @@ const App: React.FC = () => (
         <BotFileProvider>
           <BotModelProvider>
             <ChatProvider>
+              <TranscriptionFolderProvider>
+                <TranscriptionTaskProvider>
+                  <TranscriptionConversationProvider>
+                    <TranscriptionChatProvider>
+                      <TranscriptionConversationChatProvider>
               <AlertComponent />
             <BrowserRouter>
               <Routes>
@@ -60,6 +73,18 @@ const App: React.FC = () => (
                     <Route
                       path="/dashboard/chat-analytics"
                       element={<ChatAnalyticsPage />}
+                    />
+                    <Route
+                      path="/transcription"
+                      element={<TranscriptionPage />}
+                    />
+                    <Route
+                      path="/transcription/chat"
+                      element={<TranscriptionChatPage />}
+                    />
+                    <Route
+                      path="/transcription-chat"
+                      element={<TranscriptionConversationChatPage />}
                     />
                   </Route>
                   <Route
@@ -105,6 +130,11 @@ const App: React.FC = () => (
                 </Route>
               </Routes>
             </BrowserRouter>
+                      </TranscriptionConversationChatProvider>
+                    </TranscriptionChatProvider>
+                  </TranscriptionConversationProvider>
+                </TranscriptionTaskProvider>
+              </TranscriptionFolderProvider>
             </ChatProvider>
           </BotModelProvider>
         </BotFileProvider>

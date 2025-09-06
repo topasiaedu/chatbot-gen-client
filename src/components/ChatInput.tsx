@@ -13,6 +13,7 @@ interface ChatInputProps {
   setInput: (value: string) => void;
   handleSend: () => void;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 /**
@@ -24,6 +25,7 @@ const ChatInput = ({
   setInput,
   handleSend,
   placeholder = "Type a message...",
+  disabled = false,
 }: ChatInputProps): JSX.Element => {
   const [showPresetQuestions, setShowPresetQuestions] =
     useState<boolean>(false);
@@ -31,7 +33,7 @@ const ChatInput = ({
   // Handle form submission
   const onSubmit = (e: FormEvent): void => {
     e.preventDefault();
-    if (input.trim()) {
+    if (input.trim() && !disabled) {
       handleSend();
     }
   };
@@ -45,7 +47,7 @@ const ChatInput = ({
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>): void => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      if (input.trim()) {
+      if (input.trim() && !disabled) {
         handleSend();
       }
     }
@@ -159,7 +161,10 @@ const ChatInput = ({
             onChange={onChange}
             onKeyDown={onKeyDown}
             placeholder={placeholder}
-            className="w-full rounded-xl sm:rounded-2xl px-4 sm:px-7 pr-12 sm:pr-16 py-4 sm:py-6 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white/90 dark:bg-gray-900/90 text-gray-900 dark:text-white shadow-md placeholder-gray-500 dark:placeholder-gray-400 font-sans resize-none"
+            disabled={disabled}
+            className={`w-full rounded-xl sm:rounded-2xl px-4 sm:px-7 pr-12 sm:pr-16 py-4 sm:py-6 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white/90 dark:bg-gray-900/90 text-gray-900 dark:text-white shadow-md placeholder-gray-500 dark:placeholder-gray-400 font-sans resize-none ${
+              disabled ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             style={{
               minHeight: "70px",
               boxShadow: "0 2px 8px 0 rgba(0,0,0,0.08)",
@@ -170,9 +175,9 @@ const ChatInput = ({
           />
           <button
             type="submit"
-            disabled={!input.trim()}
+            disabled={!input.trim() || disabled}
             className={`absolute bottom-6 sm:bottom-10 right-6 sm:right-10 rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white shadow-lg transition-colors duration-200 ${
-              !input.trim() ? "opacity-50 cursor-not-allowed" : ""
+              !input.trim() || disabled ? "opacity-50 cursor-not-allowed" : ""
             }`}
             aria-label="Send">
             <svg
