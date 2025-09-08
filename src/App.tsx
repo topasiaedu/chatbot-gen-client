@@ -29,6 +29,7 @@ import { BotModelProvider } from "./context/BotModelContext";
 import { ChatProvider } from "./context/ChatContext";
 import { TranscriptionFolderProvider } from "./context/TranscriptionFolderContext";
 import { TranscriptionTaskProvider } from "./context/TranscriptionTaskContext";
+import { TranscriptionFileProvider } from "./context/TranscriptionFileContext";
 import { TranscriptionConversationProvider } from "./context/TranscriptionConversationContext";
 import { TranscriptionChatProvider } from "./context/TranscriptionChatContext";
 import { TranscriptionConversationChatProvider } from "./context/TranscriptionConversationChatContext";
@@ -47,7 +48,8 @@ const App: React.FC = () => (
             <ChatProvider>
               <TranscriptionFolderProvider>
                 <TranscriptionTaskProvider>
-                  <TranscriptionConversationProvider>
+                  <TranscriptionFileProvider>
+                    <TranscriptionConversationProvider>
                     <TranscriptionChatProvider>
                       <TranscriptionConversationChatProvider>
               <AlertComponent />
@@ -132,7 +134,8 @@ const App: React.FC = () => (
             </BrowserRouter>
                       </TranscriptionConversationChatProvider>
                     </TranscriptionChatProvider>
-                  </TranscriptionConversationProvider>
+                    </TranscriptionConversationProvider>
+                  </TranscriptionFileProvider>
                 </TranscriptionTaskProvider>
               </TranscriptionFolderProvider>
             </ChatProvider>

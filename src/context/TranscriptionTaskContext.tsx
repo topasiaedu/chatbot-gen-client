@@ -96,21 +96,20 @@ export const TranscriptionTaskProvider: React.FC<PropsWithChildren<{}>> = ({
     async (input: TranscriptionTaskInsert) => {
       console.log("🎯 TranscriptionTaskContext.createTask called with:", input);
       
-      // Minimal validation: at least one of folder or media url should be provided
-      const mediaUrl = input.media_url ? input.media_url.trim() : "";
-      if (mediaUrl.length === 0) {
-        console.error("❌ Media URL is empty or missing");
-        showAlert("Media URL is required to create a task", "warning");
+      // Validate required fields - file_name is required to identify the task
+      if (!input.file_name || input.file_name.trim().length === 0) {
+        console.error("❌ File name is empty or missing");
+        showAlert("File name is required to create a task", "warning");
         return null;
       }
 
       const payload: TranscriptionTaskInsert = {
         folder_id: input.folder_id || null,
-        media_url: mediaUrl,
         result_url: input.result_url || null,
         status: input.status || "PENDING",
         openai_task_id: input.openai_task_id || null,
-        file_name: input.file_name || null,
+        file_name: input.file_name.trim(),
+        language: input.language || "auto", // Default to auto-detect
       };
 
       console.log("📝 Inserting task with payload:", payload);
@@ -145,11 +144,14 @@ export const TranscriptionTaskProvider: React.FC<PropsWithChildren<{}>> = ({
       }
 
       const payload: TranscriptionTaskUpdate = { ...input };
-      if (typeof payload.media_url === "string") {
-        payload.media_url = payload.media_url.trim();
-      }
       if (typeof payload.result_url === "string") {
         payload.result_url = payload.result_url.trim();
+      }
+      if (typeof payload.file_name === "string") {
+        payload.file_name = payload.file_name.trim();
+      }
+      if (typeof payload.language === "string") {
+        payload.language = payload.language.trim();
       }
 
       const { error } = await supabase

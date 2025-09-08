@@ -12,6 +12,7 @@ import {
   Tabs,
   Tooltip,
   Spinner,
+  Select,
 } from "flowbite-react";
 import {
   HiFolder,
@@ -37,8 +38,22 @@ import {
   useTranscriptionTaskContext,
   TranscriptionTask,
 } from "../../context/TranscriptionTaskContext";
+import { useTranscriptionFileContext } from "../../context/TranscriptionFileContext";
 import { useTranscriptionConversationContext } from "../../context/TranscriptionConversationContext";
 import { useNavigate } from "react-router-dom";
+import {
+  chunkFile,
+  needsChunking,
+  formatFileSize,
+  isValidMediaFile,
+  calculateChunkProgress,
+} from "../../utils/fileChunking";
+import {
+  SUPPORTED_LANGUAGES,
+  DEFAULT_LANGUAGE,
+  getLanguageDisplayName,
+  formatLanguageDisplay,
+} from "../../utils/languageUtils";
 
 /**
  * Status color mapping for transcription tasks
@@ -120,6 +135,11 @@ const TranscriptionPage: React.FC = () => {
     refresh: refreshTasks,
   } = useTranscriptionTaskContext();
   
+  const {
+    createFiles,
+    getFilesByTaskId,
+  } = useTranscriptionFileContext();
+  
   useTranscriptionConversationContext();
 
   // Local state
@@ -127,6 +147,8 @@ const TranscriptionPage: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  const [fileLanguages, setFileLanguages] = useState<Record<string, string>>({});
 
   // Filter tasks by selected folder
   const filteredTasks = useMemo(() => {
@@ -137,32 +159,47 @@ const TranscriptionPage: React.FC = () => {
   /**
    * Handle file selection for upload
    */
-     const handleFileSelection = useCallback((files: FileList | null) => {
-     if (!files) return;
-     
-     const validFiles: File[] = [];
-     
-     Array.from(files).forEach((file) => {
-       // Check if it's a video or audio file
-       const isMedia = file.type.startsWith("video/") || file.type.startsWith("audio/");
-       if (!isMedia) {
-         showAlert(`File "${file.name}" is not a supported media file.`, "warning");
-         return;
-       }
-       
-       validFiles.push(file);
-     });
-     
-     setUploadingFiles(validFiles);
-   }, [showAlert]);
+  const handleFileSelection = useCallback((files: FileList | null) => {
+    if (!files) return;
+    
+    const validFiles: File[] = [];
+    const initialLanguages: Record<string, string> = {};
+    
+    Array.from(files).forEach((file) => {
+      // Check if it's a video or audio file
+      if (!isValidMediaFile(file)) {
+        showAlert(`File "${file.name}" is not a supported media file.`, "warning");
+        return;
+      }
+      
+      // Log file size information
+      console.log(`📄 File: ${file.name}`);
+      console.log(`📊 Size: ${formatFileSize(file.size)}`);
+      console.log(`🔧 Needs chunking: ${needsChunking(file) ? "Yes" : "No"}`);
+      
+      validFiles.push(file);
+      // Initialize with default language (auto-detect)
+      initialLanguages[file.name] = DEFAULT_LANGUAGE.code;
+    });
+    
+    setUploadingFiles(validFiles);
+    setFileLanguages(initialLanguages);
+    // Reset upload progress for new files
+    setUploadProgress({});
+  }, [showAlert]);
 
   /**
-   * Upload files to Supabase Storage and create transcription tasks
+   * Upload files to Supabase Storage with chunking and create transcription tasks
    */
   const handleUploadFiles = useCallback(async () => {
-    console.log("🚀 Starting upload process...");
+    console.log("🚀 Starting chunked upload process...");
     console.log("📁 Selected folder:", selectedFolder);
-    console.log("📄 Files to upload:", uploadingFiles.map(f => ({ name: f.name, size: f.size, type: f.type })));
+    console.log("📄 Files to upload:", uploadingFiles.map(f => ({ 
+      name: f.name, 
+      size: formatFileSize(f.size), 
+      type: f.type,
+      needsChunking: needsChunking(f)
+    })));
     
     if (uploadingFiles.length === 0) {
       console.warn("❌ No files selected for upload");
@@ -174,72 +211,117 @@ const TranscriptionPage: React.FC = () => {
     console.log("⏳ Setting upload state to true");
     
     try {
-      for (let i = 0; i < uploadingFiles.length; i++) {
-        const file = uploadingFiles[i];
-        console.log(`\n📤 Processing file ${i + 1}/${uploadingFiles.length}: ${file.name}`);
+      for (let fileIndex = 0; fileIndex < uploadingFiles.length; fileIndex++) {
+        const file = uploadingFiles[fileIndex];
+        console.log(`\n📤 Processing file ${fileIndex + 1}/${uploadingFiles.length}: ${file.name}`);
+        console.log(`📊 File size: ${formatFileSize(file.size)}`);
         
-        // Generate unique filename
-        const timestamp = Date.now();
-        const randomId = Math.random().toString(36).substring(7);
-        const extension = file.name.split(".").pop();
-        const fileName = `${timestamp}_${randomId}.${extension}`;
+        // Initialize progress for this file
+        setUploadProgress(prev => ({ ...prev, [file.name]: 0 }));
         
-        console.log("🏷️ Generated filename:", fileName);
-        console.log("📊 File details:", {
-          originalName: file.name,
-          size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-          type: file.type
-        });
+        // Chunk the file
+        console.log("✂️ Chunking file...");
+        const chunkedFile = await chunkFile(file);
+        console.log(`📦 File chunked into ${chunkedFile.chunks.length} pieces`);
         
-        // Upload to Supabase Storage in transcription/medias bucket
-        console.log("☁️ Starting Supabase storage upload...");
-        const uploadStartTime = Date.now();
-        
-        const { error: uploadError } = await supabase.storage
-          .from("transcription")
-          .upload(`medias/${fileName}`, file);
-
-        const uploadDuration = Date.now() - uploadStartTime;
-        console.log(`⏱️ Upload completed in ${uploadDuration}ms`);
-
-        if (uploadError) {
-          console.error("❌ Upload error:", uploadError);
-          showAlert(`Failed to upload "${file.name}": ${uploadError.message}`, "error");
-          continue;
+        if (chunkedFile.wasChunked) {
+          console.log("🔄 Large file detected - using chunking strategy");
+        } else {
+          console.log("📄 Small file - uploading as single chunk");
         }
-
-        console.log("✅ File uploaded successfully to storage");
-
-        // Get public URL
-        console.log("🔗 Getting public URL...");
-        const { data: urlData } = supabase.storage
-          .from("transcription")
-          .getPublicUrl(`medias/${fileName}`);
-
-        console.log("📎 Public URL generated:", urlData.publicUrl);
-
-        // Create transcription task
+        
+        // Create transcription task first
         console.log("💾 Creating transcription task in database...");
+        const fileLanguage = fileLanguages[file.name] || DEFAULT_LANGUAGE.code;
         const taskData = {
           folder_id: selectedFolder?.id || null,
-          media_url: urlData.publicUrl,
           result_url: null,
           status: "PENDING",
           openai_task_id: null,
           file_name: file.name,
+          language: fileLanguage,
         };
         console.log("📋 Task data:", taskData);
         
         const taskResult = await createTask(taskData);
-        console.log("✅ Task created:", taskResult);
+        if (!taskResult) {
+          console.error("❌ Failed to create task for file:", file.name);
+          showAlert(`Failed to create task for "${file.name}"`, "error");
+          continue;
+        }
+        console.log("✅ Task created:", taskResult.id);
+        
+        // Upload chunks and create transcription_files records
+        const transcriptionFiles = [];
+        let completedChunks = 0;
+        
+        for (let chunkIndex = 0; chunkIndex < chunkedFile.chunks.length; chunkIndex++) {
+          const chunk = chunkedFile.chunks[chunkIndex];
+          console.log(`\n📤 Uploading chunk ${chunkIndex + 1}/${chunkedFile.chunks.length} for ${file.name}`);
+          console.log(`📊 Chunk size: ${formatFileSize(chunk.size)}`);
+          
+          // Upload chunk to Supabase Storage
+          console.log("☁️ Starting Supabase storage upload...");
+          const uploadStartTime = Date.now();
+          
+          const { error: uploadError } = await supabase.storage
+            .from("transcription")
+            .upload(`medias/${chunk.chunkFileName}`, chunk.blob);
 
-        showAlert(`Successfully uploaded "${file.name}"`, "success");
-        console.log(`🎉 File ${file.name} processed successfully!`);
+          const uploadDuration = Date.now() - uploadStartTime;
+          console.log(`⏱️ Chunk upload completed in ${uploadDuration}ms`);
+
+          if (uploadError) {
+            console.error("❌ Chunk upload error:", uploadError);
+            showAlert(`Failed to upload chunk ${chunkIndex + 1} of "${file.name}": ${uploadError.message}`, "error");
+            break; // Stop processing this file
+          }
+
+          console.log("✅ Chunk uploaded successfully to storage");
+
+          // Get public URL for chunk
+          const { data: urlData } = supabase.storage
+            .from("transcription")
+            .getPublicUrl(`medias/${chunk.chunkFileName}`);
+
+          console.log("📎 Chunk public URL generated:", urlData.publicUrl);
+          
+          // Prepare transcription file record with explicit chunk ordering metadata
+          // Note: Backend can use chunk_index and total_chunks for robust reassembly
+          transcriptionFiles.push({
+            transcription_task_id: taskResult.id,
+            media_url: urlData.publicUrl,
+            chunk_index: chunk.index,
+            total_chunks: chunk.totalChunks,
+          });
+          
+          // Update progress
+          completedChunks++;
+          const progress = calculateChunkProgress(completedChunks, chunkedFile.chunks.length);
+          setUploadProgress(prev => ({ ...prev, [file.name]: progress }));
+          
+          console.log(`📈 Progress: ${progress}% (${completedChunks}/${chunkedFile.chunks.length} chunks)`);
+        }
+        
+        // Create all transcription_files records for this task
+        if (transcriptionFiles.length > 0) {
+          console.log(`💾 Creating ${transcriptionFiles.length} transcription_files records...`);
+          const createdFiles = await createFiles(transcriptionFiles);
+          console.log(`✅ Created ${createdFiles.length} transcription_files records`);
+          
+          showAlert(`Successfully uploaded "${file.name}" in ${chunkedFile.chunks.length} chunk(s)`, "success");
+          console.log(`🎉 File ${file.name} processed successfully!`);
+        } else {
+          console.error("❌ No chunks were uploaded successfully for:", file.name);
+          showAlert(`Failed to upload "${file.name}"`, "error");
+        }
       }
       
       console.log("🧹 Clearing uploaded files from state");
       setUploadingFiles([]);
-      console.log("✨ Upload process completed successfully!");
+      setUploadProgress({});
+      setFileLanguages({});
+      console.log("✨ Chunked upload process completed successfully!");
       
     } catch (error) {
       console.error("💥 Upload process error:", error);
@@ -251,8 +333,9 @@ const TranscriptionPage: React.FC = () => {
     } finally {
       console.log("🏁 Setting upload state to false");
       setIsUploading(false);
+      setUploadProgress({});
     }
-  }, [uploadingFiles, selectedFolder, createTask, showAlert]);
+  }, [uploadingFiles, selectedFolder, fileLanguages, createTask, createFiles, showAlert]);
 
   /**
    * Create a new folder
@@ -465,14 +548,14 @@ const TranscriptionPage: React.FC = () => {
                         <HiUpload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-lg font-medium mb-2">Upload Media Files</h3>
                         <p className="text-gray-600 dark:text-gray-400 mb-4">
-                          Select video or audio files to transcribe
+                          Select video or audio files to transcribe. Files larger than 45MB will be automatically chunked.
                         </p>
                         
                         <FileInput
                           multiple
                           accept="video/*,audio/*"
                           onChange={(e) => handleFileSelection(e.target.files)}
-                                                     helperText="Supported formats: MP4, AVI, MOV, MP3, WAV, M4A"
+                          helperText="Supported formats: MP4, AVI, MOV, MP3, WAV, M4A. Large files (>45MB) will be split into chunks automatically."
                         />
                         
                         {selectedFolder && (
@@ -488,33 +571,105 @@ const TranscriptionPage: React.FC = () => {
                       <div>
                         <h4 className="text-md font-medium mb-3">Selected Files</h4>
                         <div className="space-y-2 mb-4">
-                          {uploadingFiles.map((file, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
-                            >
-                              <div className="flex items-center">
-                                {getFileTypeIcon(file.name)}
-                                <div className="ml-3">
-                                  <p className="text-sm font-medium">{file.name}</p>
-                                  <p className="text-xs text-gray-500">
-                                    {(file.size / 1024 / 1024).toFixed(2)} MB
-                                  </p>
+                          {uploadingFiles.map((file, index) => {
+                            const willBeChunked = needsChunking(file);
+                            const progress = uploadProgress[file.name] || 0;
+                            const isCurrentlyUploading = isUploading && progress > 0;
+                            
+                            return (
+                              <div
+                                key={index}
+                                className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center flex-1">
+                                    {getFileTypeIcon(file.name)}
+                                    <div className="ml-3 flex-1">
+                                      <div className="flex items-center justify-between">
+                                        <p className="text-sm font-medium">{file.name}</p>
+                                        <Button
+                                          size="xs"
+                                          color="gray"
+                                          onClick={() => {
+                                            const fileToRemove = uploadingFiles[index];
+                                            setUploadingFiles((prev) =>
+                                              prev.filter((_, i) => i !== index)
+                                            );
+                                            // Remove language setting for this file
+                                            setFileLanguages((prev) => {
+                                              const updated = { ...prev };
+                                              delete updated[fileToRemove.name];
+                                              return updated;
+                                            });
+                                          }}
+                                          disabled={isUploading}
+                                        >
+                                          <HiX className="w-4 h-4" />
+                                        </Button>
+                                      </div>
+                                      <div className="flex items-center gap-2 mt-1">
+                                        <p className="text-xs text-gray-500">
+                                          {formatFileSize(file.size)}
+                                        </p>
+                                        {willBeChunked && (
+                                          <Badge color="warning" size="sm">
+                                            Will be chunked
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      
+                                      {/* Language Selection for this file */}
+                                      <div className="mt-2">
+                                        <Label 
+                                          htmlFor={`language-${index}`} 
+                                          value="Language:" 
+                                          className="text-xs mb-1 block text-gray-600 dark:text-gray-400" 
+                                        />
+                                        <Select
+                                          id={`language-${index}`}
+                                          sizing="sm"
+                                          value={fileLanguages[file.name] || DEFAULT_LANGUAGE.code}
+                                          onChange={(e) => {
+                                            setFileLanguages(prev => ({
+                                              ...prev,
+                                              [file.name]: e.target.value
+                                            }));
+                                          }}
+                                          disabled={isUploading}
+                                        >
+                                          {SUPPORTED_LANGUAGES.map((lang) => (
+                                            <option key={lang.code} value={lang.code}>
+                                              {formatLanguageDisplay(lang.code)}
+                                            </option>
+                                          ))}
+                                        </Select>
+                                      </div>
+                                      
+                                      {/* Progress bar */}
+                                      {isCurrentlyUploading && (
+                                        <div className="mt-2">
+                                          <div className="flex items-center justify-between mb-1">
+                                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                                              Uploading chunks...
+                                            </span>
+                                            <span className="text-xs text-gray-600 dark:text-gray-400">
+                                              {progress}%
+                                            </span>
+                                          </div>
+                                          <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                                            <div
+                                              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                              style={{ width: `${progress}%` }}
+                                            ></div>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
-                              <Button
-                                size="xs"
-                                color="gray"
-                                onClick={() =>
-                                  setUploadingFiles((prev) =>
-                                    prev.filter((_, i) => i !== index)
-                                  )
-                                }
-                              >
-                                <HiX className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                         
                         <Button
@@ -574,17 +729,27 @@ const TranscriptionPage: React.FC = () => {
                               >
                                 <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                                   <div className="flex items-center">
-                                    {getFileTypeIcon(task.media_url)}
-                                                                         <div className="ml-3">
-                                       <p className="text-sm font-medium">
-                                         {task.file_name || "Unknown"}
-                                       </p>
-                                       {task.folder_id && (
-                                         <p className="text-xs text-gray-500">
-                                           {folders.find((f) => f.id === task.folder_id)?.name || "Unknown Folder"}
-                                         </p>
-                                       )}
-                                     </div>
+                                    {getFileTypeIcon(task.file_name || "")}
+                                    <div className="ml-3">
+                                      <p className="text-sm font-medium">
+                                        {task.file_name || "Unknown"}
+                                      </p>
+                                      {task.folder_id && (
+                                        <p className="text-xs text-gray-500">
+                                          {folders.find((f) => f.id === task.folder_id)?.name || "Unknown Folder"}
+                                        </p>
+                                      )}
+                                      <div className="flex items-center gap-2 mt-1">
+                                        <p className="text-xs text-blue-600 dark:text-blue-400">
+                                          {getFilesByTaskId(task.id).length} file chunk(s)
+                                        </p>
+                                        {task.language && (
+                                          <Badge color="gray" size="sm">
+                                            {getLanguageDisplayName(task.language)}
+                                          </Badge>
+                                        )}
+                                      </div>
+                                    </div>
                                   </div>
                                 </Table.Cell>
                                 <Table.Cell>
@@ -603,12 +768,36 @@ const TranscriptionPage: React.FC = () => {
                                 </Table.Cell>
                                 <Table.Cell>
                                   <div className="flex gap-2">
-                                    {task.media_url && (
-                                      <Tooltip content="View media">
+                                    {getFilesByTaskId(task.id).length > 0 && (
+                                      <Tooltip content={getFilesByTaskId(task.id).length === 1 ? "View media file" : "View media chunks (individual chunks cannot be played)"}>
                                         <Button
                                           size="xs"
                                           color="gray"
-                                          onClick={() => window.open(task.media_url!, "_blank")}
+                                          onClick={() => {
+                                            const files = getFilesByTaskId(task.id);
+                                            if (files.length === 1) {
+                                              // Single file, open directly
+                                              window.open(files[0].media_url!, "_blank");
+                                            } else {
+                                              // Multiple chunks, show alert with warning
+                                              const links = files
+                                                .sort((a, b) => {
+                                                  // Prefer explicit chunk_index when available, fall back to extracting from URL
+                                                  const aIndex = typeof a.chunk_index === "number" ? a.chunk_index : (() => {
+                                                    const match = (a.media_url || "").match(/chunk(\d+)of\d+/);
+                                                    return match ? parseInt(match[1]) - 1 : 0; // convert to 0-based
+                                                  })();
+                                                  const bIndex = typeof b.chunk_index === "number" ? b.chunk_index : (() => {
+                                                    const match = (b.media_url || "").match(/chunk(\d+)of\d+/);
+                                                    return match ? parseInt(match[1]) - 1 : 0; // convert to 0-based
+                                                  })();
+                                                  return aIndex - bIndex;
+                                                })
+                                                .map((f, i) => `Chunk ${i + 1}: ${f.media_url}`)
+                                                .join('\n');
+                                              alert(`⚠️ IMPORTANT: This file was split into ${files.length} chunks for upload.\n\nIndividual chunks cannot be played as media files.\nThe backend needs to reassemble these chunks before transcription.\n\nChunk URLs:\n${links}`);
+                                            }
+                                          }}
                                         >
                                           <HiEye className="w-4 h-4" />
                                         </Button>
